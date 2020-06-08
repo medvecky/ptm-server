@@ -263,7 +263,37 @@ $ npm run test:cov
 * **Sample Call:**
   
     ```bash
-     curl --location --request DELETE 'http://localhost:3000/tasks/c58dbac1-686f-4c03-a734-3b39fc06aeaa'
+     curl --location --request DELETE 'http://localhost:3000/tasks/1'
+    ```
+
+* **Sample Response:**
+  
+    None
+
+### Sign Up
+* **URL**
+
+  ``` /auth/signup ```
+
+* **Method:**
+
+  `POST`
+  
+* **URL Params**
+    None
+* **Body Params**
+
+   `username = [string] required`
+   
+   `password = [string] required`
+  
+* **Sample Call:**
+  
+    ```bash
+     curl --location --request POST 'http://localhost:3000/auth/signup' \
+     --header 'Content-Type: application/x-www-form-urlencoded' \
+     --data-urlencode 'username=UserOne' \
+     --data-urlencode 'password=123456'
     ```
 
 * **Sample Response:**

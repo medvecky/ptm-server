@@ -299,3 +299,39 @@ $ npm run test:cov
 * **Sample Response:**
   
     None
+    
+### Sign In
+ * **URL**
+
+  ``` /auth/signin ```
+
+* **Method:**
+
+  `POST`
+  
+* **URL Params**
+
+    None
+    
+* **Body Params**
+
+   `username = [string] required`
+    
+   `password = [string] required`
+  
+* **Sample Call:**
+  
+    ```bash
+     curl --location --request POST 'http://localhost:3000/auth/signin' \
+     --header 'Content-Type: application/x-www-form-urlencoded' \
+     --data-urlencode 'username=UserOne' \
+     --data-urlencode 'password=123456'
+    ```
+
+* **Sample Response:**
+  
+    ```json
+         {
+             "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3R1c2VyMSIsImlhdCI6MTU5MTY5MjE3NCwiZXhwIjoxNTkxNjk1Nzc0fQ.zajmd0wp_7mseOQmLLM6lLwC6BnpNqqw3rtjdSNXuJI"
+         }
+     ```

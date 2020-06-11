@@ -2,7 +2,7 @@ import {
     Body,
     Controller,
     Delete,
-    Get,
+    Get, Logger,
     Param,
     ParseIntPipe,
     Patch,
@@ -23,6 +23,7 @@ import {User} from "../auth/User.entity";
 @Controller('tasks')
 @UseGuards(AuthGuard())
 export class TasksController {
+    private logger = new Logger('TasksController');
 
     constructor(private tasksService: TasksService) {
     }
@@ -31,7 +32,9 @@ export class TasksController {
     geTasks(
         @Query(ValidationPipe) filterDto: GetTasksFilterDto,
         @GetUser() user: User): Promise<Task[]> {
-       return this.tasksService.getTask(filterDto, user);
+        this.logger.verbose(
+            `User "${user.username}" retrieving tasks. Filter: ${JSON.stringify(filterDto)}`);
+        return this.tasksService.getTask(filterDto, user);
     }
 
     @Get('/:id')
@@ -46,6 +49,8 @@ export class TasksController {
     createTask(
         @Body() createTaskDto: CreateTaskDto,
         @GetUser() user: User): Promise<Task> {
+        this.logger.verbose(
+            `User "${user.username}" creating a new tasks. Data: ${JSON.stringify(createTaskDto)}`);
         return this.tasksService.createTask(createTaskDto, user);
     }
 
@@ -53,13 +58,13 @@ export class TasksController {
     deleteTaskById(
         @Param('id', ParseIntPipe) id: number,
         @GetUser() user: User): Promise<void> {
-       return this.tasksService.deleteTaskById(id, user);
+        return this.tasksService.deleteTaskById(id, user);
     }
 
     @Patch('/:id/status')
     updateTaskStatus(
         @Param('id', ParseIntPipe) id: number,
-        @Body('status', TaskStatusValidationPipe ) status: TaskStatus,
+        @Body('status', TaskStatusValidationPipe) status: TaskStatus,
         @GetUser() user: User): Promise<Task> {
         return this.tasksService.updateTaskStatus(id, status, user);
     }

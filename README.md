@@ -1,6 +1,23 @@
 ## Description
 Personal Task Management System 
 
+REST API service for a personal task management system. 
+
+The system provides the possibility to create tasks list and track the task's status as OPEN IN_PROGRESS DONE.
+
+The system is multi-user. Every user can create an account and work with own tasks list.  
+
+System supports the following operations: 
+* Create user
+* Log in
+* Delete user
+* Get user's tasks lists using filters
+* Create a new task
+* Find own task by id
+* Update own task's status
+* Delete own task by id
+
+
 ## Installation
 
 ```bash
@@ -40,6 +57,11 @@ $ npm run test:cov
 ## Endpoints
 
 ### Get Tasks  
+
+Returns the user's tasks list. 
+Can return all tasks or tasks which correspond to filter.  
+The filter can include a task's status and/or text for search in the task's title and description. 
+
 * **URL**
 
   ``` /tasks ```
@@ -136,6 +158,9 @@ $ npm run test:cov
     ```
 
 ### Create task 
+
+Creates a task for the user with a given title, description, and default state OPEN. 
+
 * **URL**
 
   ``` /tasks ```
@@ -182,6 +207,9 @@ $ npm run test:cov
     ```
 
 ### Find task by id 
+
+Returns the user's task with the given id.  
+
 * **URL**
 
   ``` /tasks/:id ```
@@ -222,6 +250,9 @@ $ npm run test:cov
     ```
 
 ### Update task status
+
+Updates tasks status with the given id to the given status. 
+
 * **URL**
 
   ``` /tasks/:id/status ```
@@ -273,6 +304,9 @@ $ npm run test:cov
     ```
 
 ### Delete task by id 
+
+Deletes the user's task with the given id.
+
 * **URL**
 
   ``` /tasks/:id ```
@@ -305,6 +339,9 @@ $ npm run test:cov
     None
 
 ### Sign Up
+
+Creates a user with a given username and password
+
 * **URL**
 
   ``` /auth/signup ```
@@ -335,6 +372,9 @@ $ npm run test:cov
     None
     
 ### Sign In
+
+Returns the user's JWT token if the username and password are valid. 
+
  * **URL**
 
    ``` /auth/signin ```
@@ -371,6 +411,9 @@ $ npm run test:cov
      ```
 
 ### Delete user
+
+Deletes user which was identified by JWT token
+
  * **URL**
 
    ``` /auth/delete/user ```

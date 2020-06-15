@@ -3,15 +3,18 @@ import {UserRepository} from "../auth/user.repository";
 import {AuthService} from "../auth/auth.service";
 import {JwtService} from "@nestjs/jwt";
 import {AuthCredentialsDto} from "../auth/dto/auth-credentials.dto";
-import {UnauthorizedException} from "@nestjs/common";
+import {NotFoundException, UnauthorizedException} from "@nestjs/common";
+import {User} from "../auth/User.entity";
 
 const signUp = jest.fn();
 const sign = jest.fn();
 const validateUserPassword = jest.fn();
+const deleteFunc = jest.fn()
 
 const mockUserRepository = () => ({
     signUp: signUp,
-    validateUserPassword: validateUserPassword
+    validateUserPassword: validateUserPassword,
+    delete: deleteFunc
 });
 
 const mockJwtService = () => ({
@@ -56,6 +59,22 @@ describe('AuthService', () => {
             validateUserPassword.mockResolvedValue(null);
             await expect(authService.signIn(authCredentialsDto)).rejects.toThrow(UnauthorizedException);
             await expect(authService.signIn(authCredentialsDto)).rejects.toThrowError('Invalid credentials');
+        });
+    });
+
+    describe('deleteUser', () => {
+        const mockUser = new User();
+        mockUser.id = 1;
+        it('calls UserRepository.delete() without throws as user exist', async () => {
+            deleteFunc.mockResolvedValue({affected: 1});
+            await (expect(authService.deleteUser(mockUser))).resolves.toBeUndefined();
+            expect(deleteFunc).toHaveBeenCalledWith({id: 1});
+        });
+
+        it('throws NotFoundException as something went wrong', async () => {
+            deleteFunc.mockResolvedValue({affected: 0});
+            await (expect(authService.deleteUser(mockUser))).rejects.toThrow(NotFoundException);
+            await (expect(authService.deleteUser(mockUser))).rejects.toThrowError('User with id: 1 not found');
         });
     });
 });

@@ -369,3 +369,35 @@ $ npm run test:cov
              "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3R1c2VyMSIsImlhdCI6MTU5MTY5MjE3NCwiZXhwIjoxNTkxNjk1Nzc0fQ.zajmd0wp_7mseOQmLLM6lLwC6BnpNqqw3rtjdSNXuJI"
          }
      ```
+
+### Delete user
+ * **URL**
+
+   ``` /auth/delete/user ```
+
+* **Method:**
+
+  `DELETE`
+  
+* **URL Params**
+
+    None
+    
+* **Body Params**
+    
+    None
+    
+* **Headers**
+    
+    `Authorization: accessToken`   
+  
+* **Sample Call:**
+  
+    ```bash
+     curl --location --request DELETE 'http://localhost:3000/auth/delete/user' \
+     --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3R1c2VyMyIsImlhdCI6MTU5MjIxMzk5OCwiZXhwIjoxNTkyMjE3NTk4fQ.wUcS5xFUFOCpIhTT5TaHxon-19LdN3LOitywdiudeT8'
+    ```
+
+* **Sample Response:**
+    
+    None

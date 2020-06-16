@@ -103,4 +103,23 @@ describe('Task Service', () => {
             expect(result.status).toEqual(TaskStatus.DONE);
         });
     });
+
+    describe('deleteAllTasks', () => {
+        it('calls TasksService.getTasks() and TasksService.deleteTaskById() as user has tasks', async () => {
+            taskService.getTasks = jest.fn();
+            taskService.deleteTaskById = jest.fn();
+            taskService.getTasks.mockResolvedValue([{id: 1}]);
+            await expect(taskService.deleteAllTasks(mockUser)).resolves.toBeUndefined();
+            expect(taskService.getTasks).toHaveBeenCalledWith({}, {id: 1, username: 'TestUser'});
+            expect(taskService.deleteTaskById).toHaveBeenCalledWith(1, {id: 1, username: 'TestUser'});
+        });
+        it('calls TasksService.getTasks() as user has not tasks', async () => {
+            taskService.getTasks = jest.fn();
+            taskService.deleteTaskById = jest.fn();
+            taskService.getTasks.mockResolvedValue([]);
+            await expect(taskService.deleteAllTasks(mockUser)).resolves.toBeUndefined();
+            expect(taskService.getTasks).toHaveBeenCalledWith({}, {id: 1, username: 'TestUser'});
+            expect(taskService.deleteTaskById).not.toHaveBeenCalled();
+        });
+    });
 });

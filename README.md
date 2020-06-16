@@ -338,6 +338,44 @@ Deletes the user's task with the given id.
   
     None
 
+### Delete all tasks
+
+Deletes all user's tasks
+
+* **URL**
+
+  ``` /tasks/all ```
+
+* **Method:**
+
+  `DELETE`
+ 
+*  **Headers**
+
+   `Authorization: accessToken`      
+  
+*  **URL Params**
+    
+   None
+
+* **Body Params**
+
+    None
+  
+* **Sample Call:**
+  
+    ```bash
+     curl --location --request DELETE 'http://localhost:3000/tasks/all'\
+     --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3R1c2VyMiIsImlhdCI6MTU5MTc4NjQ2OCwiZXhwIjoxNTkxNzkwMDY4fQ.QK5FZ-ZfgeyuEHKQgeUXMZir4sZGE3p5Ew7LGbcMxOQ'
+    ```
+
+* **Sample Response:**
+  
+    None
+
+
+
+
 ### Sign Up
 
 Creates a user with a given username and password

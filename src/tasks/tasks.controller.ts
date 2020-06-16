@@ -54,6 +54,12 @@ export class TasksController {
         return this.tasksService.createTask(createTaskDto, user);
     }
 
+    @Delete('/all')
+    deleteAllTasks(
+        @GetUser() user: User): Promise<void> {
+        return this.tasksService.deleteAllTasks(user);
+    }
+
     @Delete('/:id')
     deleteTaskById(
         @Param('id', ParseIntPipe) id: number,

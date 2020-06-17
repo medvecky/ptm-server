@@ -3,13 +3,11 @@ import {INestApplication} from '@nestjs/common';
 import * as request from 'supertest';
 import {AppModule} from './../src/app.module';
 
-import assert from "assert";
-
-describe('AppController (e2e)', () => {
+describe('AuthController (e2e)', () => {
     let app: INestApplication;
 
     const testUser = {
-        username: 'testuser34',
+        username: 'testuser39',
         password: 'TreshPass#555',
         token: ''
     }
@@ -101,11 +99,12 @@ describe('AppController (e2e)', () => {
         });
     });
     describe('deleteUser', () => {
-        it('deletes authorized user', () => {
+        it('deletes authorized user', (done) => {
             return request(app.getHttpServer())
                 .delete('/auth/delete/user')
                 .set('Authorization', 'Bearer ' + testUser.token)
-                .expect(200, {});
+                .expect(200, {})
+                .end(done);
         });
     });
 });

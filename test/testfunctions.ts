@@ -42,5 +42,9 @@ export function createTask(app, testUser, testTask, done) {
             title: testTask.title,
             description: testTask.description
         })
-        .expect(201, done);
+        .expect(201, (err, res) => {
+            expect(res.body.id).toBeDefined();
+            testTask.id = res.body.id;
+            done();
+        });
 }

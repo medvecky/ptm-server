@@ -405,6 +405,168 @@ describe('TasksController (e2e)', () => {
         });
     });
 
+    describe('deleteAllTasks', () => {
+        const testTask1 = {title: 'T1 FT1', description: 'D1 FC'};
+        const testTask2 = {title: 'T2 FC', description: 'D2 FD2'};
+        beforeEach((done) => {
+            createTask(app, testUser, testTask1, done);
+            createTask(app, testUser, testTask2, done);
+        });
+
+        it(`deletes all user's tasks`, (done) => {
+            return request(app.getHttpServer())
+                .delete('/tasks/all')
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .expect(200, {}, done);
+        });
+
+        it('not throws an error when a user has no tasks', (done) => {
+            return request(app.getHttpServer())
+                .delete('/tasks/all')
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .expect(200, {})
+                .then(() => {
+                    request(app.getHttpServer())
+                        .delete('/tasks/all')
+                        .set('Authorization', 'Bearer ' + testUser.token)
+                        .expect(200, {}, done);
+                });
+        });
+
+    });
+
+    describe('deleteTaskById', () => {
+        const testTask1 = {title: 'T1 FT1', description: 'D1 FC', id: ''};
+        beforeEach((done) => {
+            createTask(app, testUser, testTask1, done);
+        });
+
+        it('deletes task with given id', (done) => {
+            return request(app.getHttpServer())
+                .delete(`/tasks/${testTask1.id}`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .expect(200, {}, done);
+        });
+
+        it('throws an error as given id is invalid', (done) => {
+            return request(app.getHttpServer())
+                .delete(`/tasks/xxx`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .expect(
+                    400,
+                    {
+                        statusCode: 400,
+                        message: 'Validation failed (numeric string is expected)',
+                        error: 'Bad Request'
+                    },
+                    done);
+        });
+
+        it('throws an error as task with given if not found', (done) => {
+            return request(app.getHttpServer())
+                .delete(`/tasks/-2`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .expect(
+                    404,
+                    {
+                        statusCode: 404,
+                        message: 'Task with id: -2 not found',
+                        error: 'Not Found'
+
+                    },
+                    done);
+        });
+
+    });
+
+    describe('updateTaskStatus', () => {
+        const testTask = {title: 'T1 FT1', description: 'D1 FC', id: ''};
+        beforeEach((done) => {
+            createTask(app, testUser, testTask, done);
+        });
+
+        it('returns updated task as state sent as upper case', (done) => {
+            return request(app.getHttpServer())
+                .patch(`/tasks/${testTask.id}/status`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({status: 'DONE'})
+                .expect(200, (err, res) => {
+                    const result = res.body;
+                    expect(result.title).toEqual(testTask.title);
+                    expect(result.description).toEqual(testTask.description);
+                    expect(result.status).toEqual('DONE');
+                    expect(result.userId).toBeDefined();
+                    expect(result.id).toEqual(testTask.id);
+                    done();
+                });
+        });
+
+        it('returns updated task as state sent as lower case', (done) => {
+            return request(app.getHttpServer())
+                .patch(`/tasks/${testTask.id}/status`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({status: 'done'})
+                .expect(200, (err, res) => {
+                    const result = res.body;
+                    expect(result.title).toEqual(testTask.title);
+                    expect(result.description).toEqual(testTask.description);
+                    expect(result.status).toEqual('DONE');
+                    expect(result.userId).toBeDefined();
+                    expect(result.id).toEqual(testTask.id);
+                    done();
+                });
+        });
+        it('throws error as status is invalid', (done) => {
+            return request(app.getHttpServer())
+                .patch(`/tasks/${testTask.id}/status`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({status: 'rock_star'})
+                .expect(
+                    400, {
+                        statusCode: 400,
+                        message: 'ROCK_STAR is invalid status',
+                        error: 'Bad Request'
+                    },
+                    done);
+        });
+        it('throws error as status is not sent', (done) => {
+            return request(app.getHttpServer())
+                .patch(`/tasks/${testTask.id}/status`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .expect(
+                    500, {
+                        statusCode: 500,
+                        message: 'Internal server error'
+                    },
+                    done);
+        });
+        it('throws error as id invalid', (done) => {
+            return request(app.getHttpServer())
+                .patch(`/tasks/xxx/status`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({status: 'DONE'})
+                .expect(
+                    400, {
+                        statusCode: 400,
+                        message: 'Validation failed (numeric string is expected)',
+                        error: 'Bad Request'
+                    },
+                    done);
+        });
+        it('throws error as task with given id not exists', (done) => {
+            return request(app.getHttpServer())
+                .patch(`/tasks/-5/status`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({status: 'DONE'})
+                .expect(
+                    404, {
+                        statusCode: 404,
+                        message: 'Task with id: -5 not found',
+                        error: 'Not Found'
+                    },
+                    done);
+        });
+    });
     afterEach((done) => {
         deleteUser(app, testUser, done);
     });

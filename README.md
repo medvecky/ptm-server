@@ -18,19 +18,33 @@ System supports the following operations:
 * Delete own task by id
 
 
-## Installation
+## Env set up 
+
+### Prerequisites
+
+* Installed [docker](https://www.docker.com/products/docker-desktop)
+* Installed [Node.js](https://nodejs.org)
+
+### Postgres container set up
+```bash
+# build image
+docker build -t ptm-postgres .
+
+#run container from image
+docker container run -p 5432:5432 -d --name ptm-postgres ptm-postgres
+
+#restart existing container
+dcoker container start ptm-postgres
+```
+
+## App installation     
 
 ```bash
 $ npm install
 ```
 
 ## Running the app
-
 ```bash
-# postgres container setup
-docker pull postgres
-docker run -p 5432:5432 --name some-postgres -e POSTGRES_PASSWORD=mysecretpassword -d postgres
-
 # development
 $ npm run start
 

@@ -25,12 +25,13 @@ System supports the following operations:
 * Installed [docker](https://www.docker.com/products/docker-desktop)
 * Installed [Node.js](https://nodejs.org) (only for local development)
 
-### App installation 
-
 In project root dir create .env file with the following params:
 ```.env
-POSTGRES_PASSWORD=postgress_password
+POSTGRES_PASSWORD=postgres_password
+JWT_SECRET=jwt_secret
 ```
+
+### App installation 
 
 Then run docker-compose: 
 
@@ -42,11 +43,6 @@ docker-compose up
 by default service operable on localhost:3000
 
 ### App installation for local development
-
-In project root dir create .env file with the following params:
-```.env
-POSTGRES_PASSWORD=postgress_password
-```
 
 #### Postgres container set up
 ```bash

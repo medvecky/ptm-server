@@ -1,5 +1,7 @@
-node_modules
-.idea
-dist
-coverage
+node_modules/
+.idea/
+dist/
+coverage/
 npm-debug.log
+.git/
+docker-compose*.yml

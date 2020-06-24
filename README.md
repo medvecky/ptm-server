@@ -50,7 +50,7 @@ POSTGRES_PASSWORD=postgress_password
 
 #### Postgres container set up
 ```bash
-docker-compose -f postgres-compose.yml up -d
+docker-compose -f docker-compose-postgres.yml up -d
 ```
 
 #### App installation     

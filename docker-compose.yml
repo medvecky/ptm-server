@@ -1,0 +1,28 @@
+version: '3.1'
+services:
+  ptm-postgres:
+    image: postgres
+    volumes:
+      - ptm-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=mysecretpassword
+      - POSTGRES_DB=ptm
+    ports:
+      - '5432:5432'
+    networks:
+      - ptm-net
+
+  ptm-server:
+    build: .
+    ports:
+      - '3000:3000'
+    environment:
+      - RDS_HOSTNAME=ptm-postgres
+    networks:
+      - ptm-net
+
+networks:
+  ptm-net:
+
+volumes:
+  ptm-data:

@@ -23,27 +23,31 @@ System supports the following operations:
 ### Prerequisites
 
 * Installed [docker](https://www.docker.com/products/docker-desktop)
-* Installed [Node.js](https://nodejs.org)
+* Installed [Node.js](https://nodejs.org) (only for local development)
 
-### Postgres container set up
+### App installation 
+
 ```bash
-# build image
-docker build -t ptm-postgres .
-
-#run container from image
-docker container run -p 5432:5432 -d --name ptm-postgres ptm-postgres
-
-#restart existing container
-dcoker container start ptm-postgres
+docker-compose build
+docker-compose up
 ```
 
-## App installation     
+by default service operable on localhost:3000
+
+### App installation for local development
+
+#### Postgres container set up
+```bash
+docker-compose -f postgres-compose.yml up -d
+```
+
+#### App installation     
 
 ```bash
 $ npm install
 ```
 
-## Running the app
+#### Running the app
 ```bash
 # development
 $ npm run start
@@ -55,7 +59,7 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
-## Test
+#### Test
 
 ```bash
 # unit tests

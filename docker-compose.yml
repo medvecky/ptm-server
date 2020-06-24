@@ -18,6 +18,7 @@ services:
       - '3000:3000'
     environment:
       - RDS_HOSTNAME=ptm-postgres
+      - JWT_SECRET=${JWT_SECRET}
     networks:
       - ptm-net
 

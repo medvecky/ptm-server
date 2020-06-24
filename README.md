@@ -27,6 +27,13 @@ System supports the following operations:
 
 ### App installation 
 
+In project root dir create .env file with the following params:
+```.env
+POSTGRES_PASSWORD=postgress_password
+```
+
+Then run docker-compose: 
+
 ```bash
 docker-compose build
 docker-compose up
@@ -35,6 +42,11 @@ docker-compose up
 by default service operable on localhost:3000
 
 ### App installation for local development
+
+In project root dir create .env file with the following params:
+```.env
+POSTGRES_PASSWORD=postgress_password
+```
 
 #### Postgres container set up
 ```bash

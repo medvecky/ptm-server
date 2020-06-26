@@ -19,7 +19,18 @@ import {GetTasksFilterDto} from "./dto/get-tasks-filter.dto";
 import {AuthGuard} from "@nestjs/passport";
 import {GetUser} from "../auth/get-user.decorator";
 import {User} from "../auth/User.entity";
+import {
+    ApiBadRequestResponse,
+    ApiBearerAuth, ApiBody,
+    ApiCreatedResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse,
+    ApiOkResponse,
+    ApiQuery,
+    ApiTags,
+    ApiUnauthorizedResponse
+} from "@nestjs/swagger";
 
+@ApiTags('tasks')
+@ApiBearerAuth()
 @Controller('tasks')
 @UseGuards(AuthGuard())
 export class TasksController {
@@ -28,7 +39,11 @@ export class TasksController {
     constructor(private tasksService: TasksService) {
     }
 
+    @ApiQuery({name: 'status', enum: TaskStatus})
     @Get()
+    @ApiOkResponse()
+    @ApiUnauthorizedResponse()
+    @ApiBadRequestResponse()
     geTasks(
         @Query(ValidationPipe) filterDto: GetTasksFilterDto,
         @GetUser() user: User): Promise<Task[]> {
@@ -38,6 +53,9 @@ export class TasksController {
     }
 
     @Get('/:id')
+    @ApiOkResponse()
+    @ApiUnauthorizedResponse()
+    @ApiNotFoundResponse()
     getTaskById(
         @Param('id', ParseIntPipe) id: number,
         @GetUser() user: User): Promise<Task> {
@@ -45,6 +63,9 @@ export class TasksController {
     }
 
     @Post()
+    @ApiCreatedResponse()
+    @ApiUnauthorizedResponse()
+    @ApiBadRequestResponse()
     @UsePipes(ValidationPipe)
     createTask(
         @Body() createTaskDto: CreateTaskDto,
@@ -55,12 +76,18 @@ export class TasksController {
     }
 
     @Delete('/all')
+    @ApiOkResponse()
+    @ApiUnauthorizedResponse()
     deleteAllTasks(
         @GetUser() user: User): Promise<void> {
         return this.tasksService.deleteAllTasks(user);
     }
 
     @Delete('/:id')
+    @ApiOkResponse()
+    @ApiUnauthorizedResponse()
+    @ApiBadRequestResponse()
+    @ApiNotFoundResponse()
     deleteTaskById(
         @Param('id', ParseIntPipe) id: number,
         @GetUser() user: User): Promise<void> {
@@ -68,6 +95,12 @@ export class TasksController {
     }
 
     @Patch('/:id/status')
+    @ApiOkResponse()
+    @ApiUnauthorizedResponse()
+    @ApiBadRequestResponse()
+    @ApiNotFoundResponse()
+    @ApiInternalServerErrorResponse()
+    @ApiBody({ enum: TaskStatus})
     updateTaskStatus(
         @Param('id', ParseIntPipe) id: number,
         @Body('status', TaskStatusValidationPipe) status: TaskStatus,

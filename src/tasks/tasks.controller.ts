@@ -24,7 +24,6 @@ import {
     ApiBearerAuth, ApiBody,
     ApiCreatedResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse,
     ApiOkResponse,
-    ApiQuery,
     ApiTags,
     ApiUnauthorizedResponse
 } from "@nestjs/swagger";
@@ -39,11 +38,10 @@ export class TasksController {
     constructor(private tasksService: TasksService) {
     }
 
-    @ApiQuery({name: 'status', enum: TaskStatus})
     @Get()
-    @ApiOkResponse()
-    @ApiUnauthorizedResponse()
-    @ApiBadRequestResponse()
+    @ApiOkResponse({ type: [Task]})
+    @ApiUnauthorizedResponse({description: 'Unauthorized'})
+    @ApiBadRequestResponse({description: 'Bad request'})
     geTasks(
         @Query(ValidationPipe) filterDto: GetTasksFilterDto,
         @GetUser() user: User): Promise<Task[]> {
@@ -53,9 +51,9 @@ export class TasksController {
     }
 
     @Get('/:id')
-    @ApiOkResponse()
-    @ApiUnauthorizedResponse()
-    @ApiNotFoundResponse()
+    @ApiOkResponse({type: Task})
+    @ApiUnauthorizedResponse({description: 'Unauthorized'})
+    @ApiNotFoundResponse({description: 'Not found'})
     getTaskById(
         @Param('id', ParseIntPipe) id: number,
         @GetUser() user: User): Promise<Task> {
@@ -63,9 +61,9 @@ export class TasksController {
     }
 
     @Post()
-    @ApiCreatedResponse()
-    @ApiUnauthorizedResponse()
-    @ApiBadRequestResponse()
+    @ApiCreatedResponse({type: Task})
+    @ApiUnauthorizedResponse({description: 'Unauthorized'})
+    @ApiBadRequestResponse({description: 'Bad request'})
     @UsePipes(ValidationPipe)
     createTask(
         @Body() createTaskDto: CreateTaskDto,
@@ -76,18 +74,18 @@ export class TasksController {
     }
 
     @Delete('/all')
-    @ApiOkResponse()
-    @ApiUnauthorizedResponse()
+    @ApiOkResponse({description: 'Tasks successfully  deleted'})
+    @ApiUnauthorizedResponse({description: 'Unauthorized'})
     deleteAllTasks(
         @GetUser() user: User): Promise<void> {
         return this.tasksService.deleteAllTasks(user);
     }
 
     @Delete('/:id')
-    @ApiOkResponse()
-    @ApiUnauthorizedResponse()
-    @ApiBadRequestResponse()
-    @ApiNotFoundResponse()
+    @ApiOkResponse({description: 'Task successfully  deleted'})
+    @ApiUnauthorizedResponse({description: 'Unauthorized'})
+    @ApiBadRequestResponse({description: 'Bad request'})
+    @ApiNotFoundResponse({description: 'Bad request'})
     deleteTaskById(
         @Param('id', ParseIntPipe) id: number,
         @GetUser() user: User): Promise<void> {
@@ -95,12 +93,22 @@ export class TasksController {
     }
 
     @Patch('/:id/status')
-    @ApiOkResponse()
-    @ApiUnauthorizedResponse()
-    @ApiBadRequestResponse()
-    @ApiNotFoundResponse()
-    @ApiInternalServerErrorResponse()
-    @ApiBody({ enum: TaskStatus})
+    @ApiOkResponse({type: Task})
+    @ApiUnauthorizedResponse({description: 'Unauthorized'})
+    @ApiBadRequestResponse({description: 'Bad request'})
+    @ApiNotFoundResponse({description: 'Not found'})
+    @ApiInternalServerErrorResponse({description: 'Internal server error'})
+    @ApiBody({
+        schema: {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string"
+                }
+
+            }
+        }
+    })
     updateTaskStatus(
         @Param('id', ParseIntPipe) id: number,
         @Body('status', TaskStatusValidationPipe) status: TaskStatus,

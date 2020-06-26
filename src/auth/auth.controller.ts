@@ -19,27 +19,26 @@ export class AuthController {
     constructor(private authService: AuthService) {
     }
 
-
     // @UseGuards(AuthGuard())
     @Post('/signup')
-    @ApiCreatedResponse()
-    @ApiBadRequestResponse()
-    @ApiConflictResponse()
+    @ApiCreatedResponse({description: 'User successfully created'})
+    @ApiBadRequestResponse({description: 'Bad request'})
+    @ApiConflictResponse({description: 'Conflict: user already exists'})
     signUp(@Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto): Promise<void> {
         return this.authService.signUp(authCredentialsDto);
     }
 
     @Post('/signin')
-    @ApiOkResponse()
-    @ApiUnauthorizedResponse()
+    @ApiOkResponse({description: '{ accessToken: string }'})
+    @ApiUnauthorizedResponse({description: 'Unauthorized'})
     signIn(@Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto): Promise<{ accessToken: string }> {
         return this.authService.signIn(authCredentialsDto);
     }
 
     @UseGuards(AuthGuard())
     @Delete('/delete/user')
-    @ApiOkResponse()
-    @ApiUnauthorizedResponse()
+    @ApiOkResponse({description: 'User successfully deleted'})
+    @ApiUnauthorizedResponse({description: 'Unauthorized'})
     deleteUser(@GetUser() user: User): Promise<void> {
         return this.authService.deleteUser(user);
     }

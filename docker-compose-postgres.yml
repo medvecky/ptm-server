@@ -5,7 +5,7 @@ services:
     volumes:
       - ptm-data:/var/lib/postgresql/data
     environment:
-      - RDS_PASSWORD=${RDS_PASSWORD}
+      - POSTGRES_PASSWORD=${RDS_PASSWORD}
       - POSTGRES_DB=ptm
     ports:
       - '5432:5432'

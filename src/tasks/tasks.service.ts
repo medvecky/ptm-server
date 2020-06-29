@@ -35,7 +35,7 @@ export class TasksService {
         return this.taskRepository.createTask(createTaskDto, user);
     }
 
-    async deleteTaskById(id: number, user: User): Promise<void> {
+    async deleteTaskById(id: string, user: User): Promise<void> {
         const result = await this.taskRepository.delete({id, userId: user.id});
         this.logger.log(`User with id: ${user.id} deleted task with id: ${id}`)
         if (result.affected === 0) {

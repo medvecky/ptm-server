@@ -1,8 +1,6 @@
 db:
-  host: 'localhost'
-  username: 'postgres'
-  password: 'mysecretpassword'
-  synchronize: true
-
+  url: 'mongodb://root:example@localhost:27017/ptm'
+  username: 'root'
+  password: 'example'
 jwt:
   secret: 'topSecret51'

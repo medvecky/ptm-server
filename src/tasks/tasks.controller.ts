@@ -87,7 +87,7 @@ export class TasksController {
     @ApiBadRequestResponse({description: 'Bad request'})
     @ApiNotFoundResponse({description: 'Bad request'})
     deleteTaskById(
-        @Param('id', ParseIntPipe) id: number,
+        @Param('id') id: string,
         @GetUser() user: User): Promise<void> {
         return this.tasksService.deleteTaskById(id, user);
     }

@@ -2,9 +2,8 @@ server:
   port: 3000
 
 db:
-  type: 'postgres'
-  port: 5432
-  database: 'ptm'
+  type: 'mongodb'
+  url: 'mongodb://root:example@localhost:27017/ptm'
 
 jwt:
   expiresIn: 3600

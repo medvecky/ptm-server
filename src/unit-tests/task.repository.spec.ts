@@ -3,10 +3,14 @@ import {Test} from "@nestjs/testing";
 import {TaskRepository} from "../tasks/task.repository";
 import {TaskStatus} from "../tasks/task.status.enum";
 import {InternalServerErrorException} from "@nestjs/common";
+import {v4 as uuid} from 'uuid';
+
+jest.mock('uuid');
+uuid.mockImplementation(() => 'xxx')
 
 const mockUser = new User();
 mockUser.username = 'TestUser';
-mockUser.id = 1;
+mockUser.id = '1';
 
 describe('TaskRepository', () => {
     const mockCreateTaskDta = {title: 'TestTitle', description: 'TestDesc'};
@@ -21,6 +25,7 @@ describe('TaskRepository', () => {
     });
     describe('createTask', () => {
         let save;
+        let uuid;
         beforeEach(() => {
             save = jest.fn();
             taskRepository.create = jest.fn().mockReturnValue({
@@ -28,15 +33,18 @@ describe('TaskRepository', () => {
                 save: save,
                 user: mockUser
             });
+            uuid = jest.fn().mockReturnValue('xxx');
         });
         it('creates task, calls task.save() and returns task', async () => {
             const result = await taskRepository.createTask(mockCreateTaskDta, mockUser);
             delete result.save;
             expect(save).toHaveBeenCalled();
             expect(result).toEqual({
+                id: 'xxx',
                 title: 'TestTitle',
                 description: 'TestDesc',
-                status: TaskStatus.OPEN
+                status: TaskStatus.OPEN,
+                userId: '1',
             });
         });
         it('throws InternalServerException as task.save() failed', async () => {

@@ -30,5 +30,5 @@ export class Task extends BaseEntity {
 
     @Column()
     @ApiProperty()
-    userId: number;
+    userId: string;
 }

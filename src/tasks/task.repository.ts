@@ -1,13 +1,14 @@
-import {EntityRepository, Repository} from "typeorm";
+import {EntityRepository, MongoRepository} from "typeorm";
 import {Task} from "./Task.entity";
 import {CreateTaskDto} from "./dto/create-task.dto";
 import {TaskStatus} from "./task.status.enum";
 import {GetTasksFilterDto} from "./dto/get-tasks-filter.dto";
 import {User} from "../auth/User.entity";
-import {InternalServerErrorException, Logger} from "@nestjs/common";
+import {InternalServerErrorException, Logger, NotFoundException} from "@nestjs/common";
+import {v4 as uuid} from 'uuid';
 
 @EntityRepository(Task)
-export class TaskRepository extends Repository<Task> {
+export class TaskRepository extends MongoRepository<Task> {
 
     private logger = new Logger('TaskRepository');
 
@@ -17,7 +18,8 @@ export class TaskRepository extends Repository<Task> {
         task.title = title;
         task.description = description;
         task.status = TaskStatus.OPEN;
-        task.user = user;
+        task.userId = user.id;
+        task.id = uuid();
         try {
             await task.save();
         } catch (error) {
@@ -27,31 +29,52 @@ export class TaskRepository extends Repository<Task> {
             throw new InternalServerErrorException();
         }
         delete task.user;
+        delete task._id;
         return task;
     }
 
     async getTasks(filterDto: GetTasksFilterDto, user: User): Promise<Task[]> {
         const {status, search} = filterDto;
-        const query = this.createQueryBuilder('task');
 
-        query.where('task.userId = :userId', {userId: user.id});
+        let result = [];
 
-        if (status) {
-            query.andWhere('task.status = :status', {status});
+        if (!status && !search) {
+            result = await this.find({userId: user.id});
+        } else if (status && !search) {
+            result = await this.find({userId: user.id, status: status});
+        } else if (!status && search) {
+            result = await this.find({
+                where: {
+                    $and: [
+                        {userId: user.id},
+                        {
+                            $or: [
+                                {title: {$regex: `.*${search}.*`}},
+                                {description: {$regex: `.*${search}.*`}},
+                            ]
+                        }
+                    ]
+                }
+            });
+        } else {
+            result = await this.find({
+                where: {
+                    $and: [
+                        {userId: user.id},
+                        {status: status},
+                        {
+                            $or: [
+                                {title: {$regex: `.*${search}.*`}},
+                                {description: {$regex: `.*${search}.*`}},
+                            ]
+                        }
+                    ]
+                }
+            });
         }
 
-        if (search) {
-            query.andWhere('(task.title LIKE :search OR task.description LIKE :search)',
-                {search: `%${search}%`});
-        }
-        try {
-            const tasks = await query.getMany();
-            return tasks;
-        } catch (error) {
-            this.logger.error(
-                `Failed to get tasks for user "${user.username}". DTO: ${JSON.stringify(filterDto)}`,
-                error.stack);
-            throw new InternalServerErrorException();
-        }
+
+        result.forEach(task => delete task._id);
+        return result
     }
 }

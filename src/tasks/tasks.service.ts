@@ -1,4 +1,4 @@
-import {Injectable, Logger, NotFoundException} from '@nestjs/common';
+import {BadRequestException, Injectable, Logger, NotFoundException} from '@nestjs/common';
 import {TaskRepository} from "./task.repository";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Task} from "./Task.entity";
@@ -22,12 +22,13 @@ export class TasksService {
     }
 
 
-    async getTaskById(id: number, user: User): Promise<Task> {
-        const foundTask = await this.taskRepository.findOne({where: {id, userId: user.id}});
+    async getTaskById(id: string, user: User): Promise<Task> {
+        const foundTask = await this.taskRepository.findOne({id: id, userId: user.id});
         if (!foundTask) {
             throw new NotFoundException(`Task with id: ${id} not found`);
         }
 
+        delete foundTask._id;
         return foundTask;
     }
 
@@ -52,11 +53,18 @@ export class TasksService {
         });
     }
 
-    async updateTaskStatus(id: number, status: TaskStatus, user: User): Promise<Task> {
-        const task = await this.getTaskById(id, user);
-        task.status = status;
-        await task.save();
-        return task;
+    async updateTaskStatus(id: string, status: TaskStatus, user: User): Promise<Task> {
+
+        const result = await this.taskRepository.findOneAndUpdate(
+            {id: id, userId: user.id},
+            {$set: {status: status}},
+            {returnOriginal: false});
+
+        if(!result.value) {
+            throw new BadRequestException();
+        }
+
+        return result.value;
     }
 
 }

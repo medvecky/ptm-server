@@ -64,6 +64,7 @@ export class TasksService {
             throw new BadRequestException();
         }
 
+        delete result.value._id;
         return result.value;
     }
 

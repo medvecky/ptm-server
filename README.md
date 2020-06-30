@@ -137,32 +137,32 @@ The filter can include a task's status and/or text for search in the task's titl
     ```json
      [
          {
-             "id": 4,
+             "id": "4",
              "title": "New task",
              "description": "Task in DATA BASE",
              "status": "OPEN",
-             "userId": 1
+             "userId": "1"
          },
          {
-             "id": 5,
+             "id": "5",
              "title": "New task",
              "description": "Task in DATA BASE",
              "status": "IN_PROGRESS",
-             "userId": 1
+             "userId": "1"
          },
          {
-             "id": 6,
+             "id": "6",
              "title": "New task one",
              "description": "Task in DATA BASE",
              "status": "OPEN",
-             "userId": 1
+             "userId": "1"
          },
          {
-             "id": 7,
+             "id": "7",
              "title": "New task one",
              "description": "Task in DATA BASE two",
              "status": "OPEN",
-             "userId": 1
+             "userId": "1"
            }
      ]
     ```
@@ -177,11 +177,11 @@ The filter can include a task's status and/or text for search in the task's titl
     ```json
     [
         {
-            "id": 7,
+            "id": "7",
             "title": "New task one",
             "description": "Task in DATA BASE two",
             "status": "OPEN",
-            "userId": 1
+            "userId": "1"
         }
     ]
     ```
@@ -230,8 +230,8 @@ Creates a task for the user with a given title, description, and default state O
         "title": "New task one",
         "description": "Task in DATA BASE two",
         "status": "OPEN",
-        "userId": 1,
-        "id": 7
+        "userId": "1",
+        "id": "7"
     }
     ```
 
@@ -253,7 +253,7 @@ Returns the user's task with the given id.
 
 *  **URL Params**
 
-   `id = [number] required`
+   `id = [string] required`
 
 * **Body Params**
 
@@ -270,11 +270,11 @@ Returns the user's task with the given id.
 
     ```json
     {
-        "id": 5,
+        "id": "5",
         "title": "New task",
         "description": "Task in DATA BASE",
         "status": "IN_PROGRESS",
-        "userId": 1
+        "userId": "1"
     }
     ```
 
@@ -296,7 +296,7 @@ Updates tasks status with the given id to the given status.
 
 *  **URL Params**
 
-   `id = [number] required`
+   `id = [string] required`
 
 * **Body Params**
 
@@ -323,11 +323,11 @@ Updates tasks status with the given id to the given status.
 
     ```json
       {
-          "id": 5,
+          "id": "5",
           "title": "New task",
           "description": "Task in DATA BASE",
           "status": "DONE",
-          "userId": 1
+          "userId": "1"
       }
 
     ```
@@ -350,7 +350,7 @@ Deletes the user's task with the given id.
 
 *  **URL Params**
 
-   `id = [number] required`
+   `id = [string] required`
 
 * **Body Params**
 

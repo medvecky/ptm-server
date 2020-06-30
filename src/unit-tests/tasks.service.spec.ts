@@ -8,11 +8,12 @@ import {NotFoundException} from "@nestjs/common";
 const mockTaskRepository = () => ({
     getTasks: jest.fn(),
     findOne: jest.fn(),
+    findOneAndUpdate: jest.fn(),
     createTask: jest.fn(),
     delete: jest.fn()
 });
 
-const mockUser = {username: 'TestUser', id: 1};
+const mockUser = {username: 'TestUser', id: '1'};
 
 describe('Task Service', () => {
     let taskService;
@@ -48,9 +49,9 @@ describe('Task Service', () => {
         it('calls repository.findOne() and successful retrieve and return the task', async () => {
             const mockTask = {title: 'Test title', description: 'Test Desc'};
             taskRepository.findOne.mockResolvedValue(mockTask);
-            const result = await taskService.getTaskById(1, mockUser);
+            const result = await taskService.getTaskById('1', mockUser);
             expect(result).toEqual(mockTask);
-            expect(taskRepository.findOne).toHaveBeenCalledWith({where: {id: 1, userId: mockUser.id}});
+            expect(taskRepository.findOne).toHaveBeenCalledWith({id: '1', userId: '1',});
         });
 
         it('throws an error as task is not found', () => {
@@ -89,17 +90,14 @@ describe('Task Service', () => {
 
     describe('updateTaskStatus', () => {
         it('updates task status', async () => {
-            const save = jest.fn().mockResolvedValue(true);
-            taskService.getTaskById = jest.fn().mockResolvedValue({
-                status: TaskStatus.OPEN,
-                save
-            });
-
-            expect(taskService.getTaskById).not.toHaveBeenCalled();
-            expect(save).not.toHaveBeenCalled();
-            const result = await taskService.updateTaskStatus(1, TaskStatus.DONE, mockUser);
-            expect(taskService.getTaskById).toHaveBeenCalledWith(1, mockUser);
-            expect(save).toHaveBeenCalled();
+            taskRepository.findOneAndUpdate.mockResolvedValue({value: {status: 'DONE'}})
+            const result = await taskService.updateTaskStatus('1', TaskStatus.DONE, mockUser);
+            expect(taskRepository.findOneAndUpdate).toHaveBeenCalledWith({
+                    id: '1',
+                    userId: '1',
+                },
+                {$set: {status: 'DONE'}},
+                {returnOriginal: false});
             expect(result.status).toEqual(TaskStatus.DONE);
         });
     });
@@ -110,15 +108,15 @@ describe('Task Service', () => {
             taskService.deleteTaskById = jest.fn();
             taskService.getTasks.mockResolvedValue([{id: 1}]);
             await expect(taskService.deleteAllTasks(mockUser)).resolves.toBeUndefined();
-            expect(taskService.getTasks).toHaveBeenCalledWith({}, {id: 1, username: 'TestUser'});
-            expect(taskService.deleteTaskById).toHaveBeenCalledWith(1, {id: 1, username: 'TestUser'});
+            expect(taskService.getTasks).toHaveBeenCalledWith({}, {id: '1', username: 'TestUser'});
+            expect(taskService.deleteTaskById).toHaveBeenCalledWith(1, {id: '1', username: 'TestUser'});
         });
         it('calls TasksService.getTasks() as user has not tasks', async () => {
             taskService.getTasks = jest.fn();
             taskService.deleteTaskById = jest.fn();
             taskService.getTasks.mockResolvedValue([]);
             await expect(taskService.deleteAllTasks(mockUser)).resolves.toBeUndefined();
-            expect(taskService.getTasks).toHaveBeenCalledWith({}, {id: 1, username: 'TestUser'});
+            expect(taskService.getTasks).toHaveBeenCalledWith({}, {id: '1', username: 'TestUser'});
             expect(taskService.deleteTaskById).not.toHaveBeenCalled();
         });
     });

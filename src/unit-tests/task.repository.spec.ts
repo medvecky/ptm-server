@@ -53,62 +53,64 @@ describe('TaskRepository', () => {
         });
     });
     describe('getTasks', () => {
-        let where;
-        let andWhere;
-        let getMany;
-        beforeEach(() => {
-            where = jest.fn();
-            andWhere = jest.fn();
-            getMany = jest.fn();
 
-            taskRepository.createQueryBuilder = jest.fn().mockReturnValue({
-                where,
-                andWhere,
-                getMany
-            });
+        let findMock;
+
+        beforeEach(() => {
+            findMock = jest.fn();
+            taskRepository.find = findMock;
         });
 
         it('returns tasks without filters', async () => {
-            getMany.mockResolvedValue(['task1', 'task2']);
+            findMock.mockResolvedValue(['task1', 'task2']);
             const result = await taskRepository.getTasks({}, mockUser);
-            expect(where).toHaveBeenCalledWith("task.userId = :userId", {userId: 1});
-            expect(andWhere).not.toHaveBeenCalled();
+            expect(findMock).toHaveBeenCalledWith({userId: '1'});
             expect(result).toEqual(['task1', 'task2']);
         });
         it('returns tasks correspond status criteria', async () => {
-            getMany.mockResolvedValue(['task1', 'task2']);
+            findMock.mockResolvedValue(['task1', 'task2']);
             const result = await taskRepository.getTasks({status: TaskStatus.OPEN}, mockUser);
-            expect(where).toHaveBeenCalledWith("task.userId = :userId", {userId: 1});
-            expect(andWhere).toHaveBeenCalledTimes(1);
-            expect(andWhere).toHaveBeenCalledWith("task.status = :status", {status: TaskStatus.OPEN});
+            expect(findMock).toHaveBeenCalledWith({userId: '1', status: 'OPEN'});
             expect(result).toEqual(['task1', 'task2']);
         });
         it('returns tasks correspond search criteria', async () => {
-            getMany.mockResolvedValue(['task1', 'task2']);
+            findMock.mockResolvedValue(['task1', 'task2']);
             const result = await taskRepository.getTasks({search: 'TestSearch'}, mockUser);
-            expect(where).toHaveBeenCalledWith("task.userId = :userId", {userId: 1});
-            expect(andWhere).toHaveBeenCalledTimes(1);
-            expect(andWhere).toHaveBeenCalledWith("(task.title LIKE :search OR task.description LIKE :search)",
-                {search: '%TestSearch%'});
+            expect(findMock).toHaveBeenCalledWith(
+                {
+                    "where":
+                        {
+                            "$and":
+                                [
+                                    {"userId": "1"},
+                                    {
+                                        "$or": [{"title": {"$regex": ".*TestSearch.*"}},
+                                            {"description": {"$regex": ".*TestSearch.*"}}]
+                                    }]
+                        }
+                });
             expect(result).toEqual(['task1', 'task2']);
         });
         it('returns tasks correspond search and status criteria', async () => {
-            getMany.mockResolvedValue(['task1', 'task2']);
+            findMock.mockResolvedValue(['task1', 'task2']);
             const result = await taskRepository.getTasks({status: TaskStatus.OPEN, search: 'TestSearch'}, mockUser);
-            expect(where).toHaveBeenCalledWith("task.userId = :userId", {userId: 1});
-            expect(andWhere).toHaveBeenCalledTimes(2);
-            expect(andWhere).toHaveBeenNthCalledWith(
-                1,
-                'task.status = :status',
-                {status: TaskStatus.OPEN});
-            expect(andWhere).toHaveBeenNthCalledWith(
-                2,
-                "(task.title LIKE :search OR task.description LIKE :search)",
-                {search: '%TestSearch%'});
+            expect(findMock).toHaveBeenCalledWith(
+                {
+                    "where":
+                        {
+                            "$and":
+                                [{"userId": "1"},
+                                    {"status": "OPEN"},
+                                    {
+                                        "$or": [{"title": {"$regex": ".*TestSearch.*"}},
+                                            {"description": {"$regex": ".*TestSearch.*"}}]
+                                    }]
+                        }
+                });
             expect(result).toEqual(['task1', 'task2']);
         });
         it('throws InternalServerException as query execution failed', async () => {
-            getMany.mockRejectedValue({error: '333'});
+            findMock.mockRejectedValue({error: '333'});
             await expect(taskRepository.getTasks({}, mockUser)).rejects.toThrow(InternalServerErrorException);
 
         });

@@ -3,7 +3,7 @@ import {TasksService} from "../tasks/tasks.service";
 import {TaskRepository} from "../tasks/task.repository";
 import {GetTasksFilterDto} from "../tasks/dto/get-tasks-filter.dto";
 import {TaskStatus} from "../tasks/task.status.enum";
-import {NotFoundException} from "@nestjs/common";
+import {BadRequestException, NotFoundException} from "@nestjs/common";
 
 const mockTaskRepository = () => ({
     getTasks: jest.fn(),
@@ -75,16 +75,19 @@ describe('Task Service', () => {
 
     describe('deleteTaskById', () => {
         it('calls taskRepository.delete() to delete task', async () => {
-            taskRepository.delete.mockResolvedValue({affected: 1});
+            taskService.getTaskById = jest.fn().mockResolvedValue(true);
             expect(taskRepository.delete).not.toHaveBeenCalled();
             await taskService.deleteTaskById(1, mockUser);
             expect(taskRepository.delete).toHaveBeenCalledWith({id: 1, userId: mockUser.id});
+            expect(taskService.getTaskById).toHaveBeenCalledWith( 1, {"id": "1", "username": "TestUser"});
         });
 
         it('throws an error as task cold not be found', async () => {
             taskRepository.delete.mockResolvedValue({affected: 0});
             await expect(taskService.deleteTaskById(1, mockUser)).rejects.toThrow(NotFoundException);
-            await expect(taskService.deleteTaskById(1, mockUser)).rejects.toThrowError('Task with id: 1 not found');
+            await expect(taskService.deleteTaskById(1, mockUser))
+                .rejects
+                .toThrowError('Task with id: 1 not found');
         });
     });
 
@@ -99,6 +102,15 @@ describe('Task Service', () => {
                 {$set: {status: 'DONE'}},
                 {returnOriginal: false});
             expect(result.status).toEqual(TaskStatus.DONE);
+        });
+        it('throws error when task not found', async () => {
+            taskRepository.findOneAndUpdate.mockResolvedValue({value: undefined})
+            await expect(taskService.updateTaskStatus('1', TaskStatus.DONE, mockUser))
+                .rejects
+                .toThrow(NotFoundException);
+            await expect(taskService.updateTaskStatus('1', TaskStatus.DONE, mockUser))
+                .rejects
+                .toThrowError('Task with id: 1 not found');
         });
     });
 

@@ -23,6 +23,10 @@ describe('TasksController (e2e)', () => {
         await createUser(app, testUser, done);
     });
 
+    afterEach(async () => {
+        await app.close();
+    });
+
     describe('createTask', () => {
 
         const testTask = {
@@ -375,20 +379,6 @@ describe('TasksController (e2e)', () => {
                 });
         });
 
-        it('returns error as given id not a number', (done) => {
-            return request(app.getHttpServer())
-                .get(`/tasks/xxx`)
-                .set('Authorization', 'Bearer ' + testUser.token)
-                .expect(
-                    400,
-                    {
-                        statusCode: 400,
-                        message: 'Validation failed (numeric string is expected)',
-                        error: 'Bad Request'
-                    },
-                    done);
-        });
-
         it('returns 404 error as given id exists', (done) => {
             return request(app.getHttpServer())
                 .get(`/tasks/-2`)
@@ -448,19 +438,6 @@ describe('TasksController (e2e)', () => {
                 .expect(200, {}, done);
         });
 
-        it('throws an error as given id is invalid', (done) => {
-            return request(app.getHttpServer())
-                .delete(`/tasks/xxx`)
-                .set('Authorization', 'Bearer ' + testUser.token)
-                .expect(
-                    400,
-                    {
-                        statusCode: 400,
-                        message: 'Validation failed (numeric string is expected)',
-                        error: 'Bad Request'
-                    },
-                    done);
-        });
 
         it('throws an error as task with given if not found', (done) => {
             return request(app.getHttpServer())
@@ -540,19 +517,7 @@ describe('TasksController (e2e)', () => {
                     },
                     done);
         });
-        it('throws error as id invalid', (done) => {
-            return request(app.getHttpServer())
-                .patch(`/tasks/xxx/status`)
-                .set('Authorization', 'Bearer ' + testUser.token)
-                .send({status: 'DONE'})
-                .expect(
-                    400, {
-                        statusCode: 400,
-                        message: 'Validation failed (numeric string is expected)',
-                        error: 'Bad Request'
-                    },
-                    done);
-        });
+
         it('throws error as task with given id not exists', (done) => {
             return request(app.getHttpServer())
                 .patch(`/tasks/-5/status`)

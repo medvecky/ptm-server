@@ -55,7 +55,7 @@ export class TasksController {
     @ApiUnauthorizedResponse({description: 'Unauthorized'})
     @ApiNotFoundResponse({description: 'Not found'})
     getTaskById(
-        @Param('id', ParseIntPipe) id: number,
+        @Param('id') id: string,
         @GetUser() user: User): Promise<Task> {
         return this.tasksService.getTaskById(id, user);
     }
@@ -87,7 +87,7 @@ export class TasksController {
     @ApiBadRequestResponse({description: 'Bad request'})
     @ApiNotFoundResponse({description: 'Bad request'})
     deleteTaskById(
-        @Param('id', ParseIntPipe) id: number,
+        @Param('id') id: string,
         @GetUser() user: User): Promise<void> {
         return this.tasksService.deleteTaskById(id, user);
     }
@@ -110,7 +110,7 @@ export class TasksController {
         }
     })
     updateTaskStatus(
-        @Param('id', ParseIntPipe) id: number,
+        @Param('id') id: string,
         @Body('status', TaskStatusValidationPipe) status: TaskStatus,
         @GetUser() user: User): Promise<Task> {
         return this.tasksService.updateTaskStatus(id, status, user);

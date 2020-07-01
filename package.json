@@ -28,10 +28,12 @@
     "@nestjs/platform-express": "^7.0.0",
     "@nestjs/swagger": "^4.5.11",
     "@nestjs/typeorm": "^7.1.0",
+    "@types/mongodb": "^3.5.25",
     "bcrypt": "^5.0.0",
     "class-transformer": "^0.2.3",
     "class-validator": "^0.12.2",
     "config": "^3.3.1",
+    "mongodb": "^3.5.9",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "pg": "^8.2.1",
@@ -39,7 +41,8 @@
     "rimraf": "^3.0.2",
     "rxjs": "^6.5.4",
     "swagger-ui-express": "^4.1.4",
-    "typeorm": "^0.2.25"
+    "typeorm": "^0.2.25",
+    "uuid": "^8.2.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^7.0.0",

@@ -64,11 +64,11 @@ describe('AuthService', () => {
 
     describe('deleteUser', () => {
         const mockUser = new User();
-        mockUser.id = 1;
+        mockUser.id = '1';
         it('calls UserRepository.delete() without throws as user exist', async () => {
             deleteFunc.mockResolvedValue({affected: 1});
             await (expect(authService.deleteUser(mockUser))).resolves.toBeUndefined();
-            expect(deleteFunc).toHaveBeenCalledWith({id: 1});
+            expect(deleteFunc).toHaveBeenCalledWith({id: '1'});
         });
 
         it('throws NotFoundException as something went wrong', async () => {

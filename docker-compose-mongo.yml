@@ -11,23 +11,6 @@ services:
       - MONGO_INITDB_DATABASE=ptm
     ports:
       - '27017:27017'
-    networks:
-      - ptm-net
-
-  ptm-server:
-    build: .
-    ports:
-      - '3000:3000'
-    environment:
-      - RDS_URL=${RDS_URL}
-      - RDS_USERNAME=${RDS_USERNAME}
-      - RDS_PASSWORD=${RDS_PASSWORD}
-      - JWT_SECRET=${JWT_SECRET}
-    networks:
-      - ptm-net
-
-networks:
-  ptm-net:
 
 volumes:
   ptm-data:

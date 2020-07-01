@@ -33,13 +33,13 @@ describe('UserRepository', () => {
         });
 
         it('throws a conflict exception as username already exists', async () => {
-            save.mockRejectedValue({code: '23505'});
+            save.mockRejectedValue({code: 11000});
             await expect(userRepository.signUp(mockCredentialsDto)).rejects.toThrow(ConflictException);
             await expect(userRepository.signUp(mockCredentialsDto)).rejects.toThrowError('username already exists');
         });
 
         it('throws an internal server error when something went wrong', async () => {
-            save.mockRejectedValue({code: '23555'});
+            save.mockRejectedValue({code: 12000});
             await expect(userRepository.signUp(mockCredentialsDto)).rejects.toThrow(InternalServerErrorException);
             await expect(userRepository.signUp(mockCredentialsDto)).rejects.toThrowError('Internal Server Error');
         });

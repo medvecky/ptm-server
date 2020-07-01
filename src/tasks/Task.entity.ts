@@ -1,13 +1,17 @@
-import {BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
+import {BaseEntity, Column, Entity, ManyToOne, ObjectIdColumn, PrimaryColumn} from "typeorm";
 import {TaskStatus} from "./task.status.enum";
 import {User} from "../auth/User.entity";
 import {ApiProperty} from "@nestjs/swagger";
 
 @Entity()
 export class Task extends BaseEntity {
-    @PrimaryGeneratedColumn()
+
+    @ObjectIdColumn()
+    _id: string;
+
+    @PrimaryColumn()
     @ApiProperty()
-    id: number;
+    id: string;
 
     @Column()
     @ApiProperty()
@@ -26,5 +30,5 @@ export class Task extends BaseEntity {
 
     @Column()
     @ApiProperty()
-    userId: number;
+    userId: string;
 }

@@ -2,6 +2,7 @@ import {BaseEntity, Column, Entity, ManyToOne, ObjectIdColumn, PrimaryColumn} fr
 import {TaskStatus} from "./task.status.enum";
 import {User} from "../auth/User.entity";
 import {ApiProperty} from "@nestjs/swagger";
+import {Project} from "../projects/Project.entity";
 
 @Entity()
 export class Task extends BaseEntity {
@@ -28,7 +29,14 @@ export class Task extends BaseEntity {
     @ManyToOne(type => User, user => user.tasks, {eager: false})
     user: User;
 
+    @ManyToOne(type => Project, project => project.tasks, {eager: false})
+    project: Project;
+
     @Column()
     @ApiProperty()
     userId: string;
+
+    @Column()
+    @ApiProperty()
+    projectId: string;
 }

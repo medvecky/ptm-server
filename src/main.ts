@@ -16,6 +16,7 @@ async function bootstrap() {
         .setDescription('PTM API swagger docs')
         .addTag('tasks')
         .addTag('auth')
+        .addTag('projects')
         .build();
     const document = SwaggerModule.createDocument(app, options);
     SwaggerModule.setup('api', app, document);

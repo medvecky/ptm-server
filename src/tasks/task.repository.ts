@@ -28,8 +28,7 @@ export class TaskRepository extends MongoRepository<Task> {
                 error.stack);
             throw new InternalServerErrorException();
         }
-        delete task.user;
-        delete task._id;
+
         return task;
     }
 

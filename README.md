@@ -511,3 +511,48 @@ Deletes user which was identified by JWT token
 * **Sample Response:**
 
     None
+
+### Create project
+
+Creates project with given title and description
+
+ * **URL**
+
+   ``` /projects ```
+
+* **Method:**
+
+  `POST`
+
+* **URL Params**
+
+    None
+
+* **Body Params**
+
+   `title = [string] required`
+   
+   `description = [string] optional`
+
+* **Headers**
+
+    `Authorization: accessToken`
+
+* **Sample Call:**
+
+    ```bash
+      curl -X POST "http://localhost:3000/projects" -H "accept: application/json" \
+         -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QxIiwiaWF0IjoxNTkzNzc0ODY2LCJleHAiOjE1OTM3Nzg0NjZ9.p98ipa4vhQwrREG4gAdvFedOd2WV83oo5zDaerdqg0M" \
+         -H "Content-Type: application/json" -d "{\"title\":\"Test Title\",\"description\":\"Test Description\"}"
+    ```
+
+* **Sample Response:**
+
+    ```json
+      {
+        "title": "Test Title",
+        "description": "Test Description",
+        "userId": "92e3017e-2676-4414-a039-dbcb28dd045f",
+        "id": "5e1b3aa6-7881-4371-91ac-9bf94dbb7114"
+      }
+    ```

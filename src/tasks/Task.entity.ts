@@ -10,20 +10,20 @@ export class Task extends BaseEntity {
     @ObjectIdColumn()
     _id: string;
 
-    @PrimaryColumn()
     @ApiProperty()
+    @PrimaryColumn()
     id: string;
 
-    @Column()
     @ApiProperty()
+    @Column()
     title: string;
 
-    @Column()
     @ApiProperty()
+    @Column()
     description: string;
 
-    @Column()
     @ApiProperty()
+    @Column()
     status: TaskStatus;
 
     @ManyToOne(type => User, user => user.tasks, {eager: false})
@@ -32,11 +32,11 @@ export class Task extends BaseEntity {
     @ManyToOne(type => Project, project => project.tasks, {eager: false})
     project: Project;
 
-    @Column()
     @ApiProperty()
+    @Column()
     userId: string;
 
-    @Column()
     @ApiProperty()
+    @Column()
     projectId: string;
 }

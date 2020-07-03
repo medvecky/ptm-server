@@ -3,7 +3,7 @@ import {TasksService} from "../tasks/tasks.service";
 import {TaskRepository} from "../tasks/task.repository";
 import {GetTasksFilterDto} from "../tasks/dto/get-tasks-filter.dto";
 import {TaskStatus} from "../tasks/task.status.enum";
-import {BadRequestException, NotFoundException} from "@nestjs/common";
+import {NotFoundException} from "@nestjs/common";
 
 const mockTaskRepository = () => ({
     getTasks: jest.fn(),
@@ -61,10 +61,9 @@ describe('Task Service', () => {
     });
 
     describe('createTask', () => {
-        it('calls taskRepository.createTask() and returns the reslt', async () => {
+        it('calls taskRepository.createTask() and returns the result', async () => {
 
             taskRepository.createTask.mockResolvedValue('someTask');
-
             const createTaskDto = {title: 'Test task', description: 'Test desc'};
             expect(taskRepository.createTask).not.toHaveBeenCalled();
             const result = await taskService.createTask(createTaskDto, mockUser);

@@ -22,10 +22,6 @@ export class Project extends BaseEntity {
     @Column()
     description: string;
 
-    @ApiProperty()
-    @Column()
-    status: TaskStatus;
-
     @ManyToOne(type => User, user => user.projects, {eager: false})
     user: User;
 

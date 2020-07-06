@@ -40,7 +40,11 @@ describe('Task Service', () => {
                 search: 'Some search query'
             };
             const result = await taskService.getTasks(filters, mockUser);
-            expect(taskRepository.getTasks).toHaveBeenCalled();
+            expect(taskRepository.getTasks).toHaveBeenCalledWith({
+                    "search": "Some search query",
+                    "status": "IN_PROGRESS",
+                },
+                {"id": "1", "username": "TestUser"});
             expect(result).toEqual('someValue');
         });
     });
@@ -56,7 +60,10 @@ describe('Task Service', () => {
 
         it('throws an error as task is not found', () => {
             taskRepository.findOne.mockResolvedValue(null);
-            expect(taskService.getTaskById(1, mockUser)).rejects.toThrow(NotFoundException);
+            expect(taskService.getTaskById('1', mockUser)).rejects.toThrow(NotFoundException);
+            expect(taskService.getTaskById('1', mockUser))
+                .rejects
+                .toThrow('Task with id: 1 not found');
         });
     });
 
@@ -78,11 +85,10 @@ describe('Task Service', () => {
             expect(taskRepository.delete).not.toHaveBeenCalled();
             await taskService.deleteTaskById(1, mockUser);
             expect(taskRepository.delete).toHaveBeenCalledWith({id: 1, userId: mockUser.id});
-            expect(taskService.getTaskById).toHaveBeenCalledWith( 1, {"id": "1", "username": "TestUser"});
+            expect(taskService.getTaskById).toHaveBeenCalledWith(1, {"id": "1", "username": "TestUser"});
         });
 
         it('throws an error as task cold not be found', async () => {
-            taskRepository.delete.mockResolvedValue({affected: 0});
             await expect(taskService.deleteTaskById(1, mockUser)).rejects.toThrow(NotFoundException);
             await expect(taskService.deleteTaskById(1, mockUser))
                 .rejects

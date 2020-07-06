@@ -2,6 +2,7 @@ import {v4 as uuid} from 'uuid';
 import {Test} from "@nestjs/testing";
 import {ProjectRepository} from "../projects/project.repository";
 import {User} from "../auth/User.entity";
+import {InternalServerErrorException} from "@nestjs/common";
 
 jest.mock('uuid');
 uuid.mockImplementation(() => 'xxx')
@@ -47,6 +48,48 @@ describe('ProjectsRepository', () => {
             save.mockRejectedValue({error: '333'});
             await expect(projectRepository.createProject(mockCreateProjectDto, mockUser)).rejects.toThrow();
         });
+    });
+
+    describe('GetProjects', () => {
+        let findMock;
+
+        beforeEach(() => {
+            findMock = jest.fn();
+            projectRepository.find = findMock;
+        });
+
+        it('should to return projects without search', async () => {
+            findMock.mockResolvedValue(['project', 'project2']);
+            const result = await projectRepository.getProjects(undefined, mockUser);
+            expect(findMock).toHaveBeenCalledWith({userId: '1'});
+            expect(result).toEqual(['project', 'project2']);
+        });
+
+        it('should to return projects with search', async () => {
+            findMock.mockResolvedValue(['project', 'project2']);
+            const result = await projectRepository.getProjects('xx', mockUser);
+            expect(findMock).toHaveBeenCalledWith({
+                where: {
+                    $and: [
+                        {userId: '1'},
+                        {
+                            $or: [
+                                {title: {$regex: `.*xx.*`}},
+                                {description: {$regex: `.*xx.*`}},
+                            ]
+                        }
+                    ]
+                }
+            });
+            expect(result).toEqual(['project', 'project2']);
+        });
+
+        it(' shoult to throw InternalServerException as query execution failed', async () => {
+            findMock.mockRejectedValue({error: '333'});
+            await expect(projectRepository.getProjects('xxx', mockUser)).rejects.toThrow(InternalServerErrorException);
+
+        });
+
     });
 
 });

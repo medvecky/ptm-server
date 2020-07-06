@@ -27,4 +27,34 @@ export class ProjectRepository extends MongoRepository<Project> {
         delete project._id;
         return project;
     }
+
+    async getProjects(search: string, user: User): Promise<Project[]> {
+
+        let result = [];
+
+        try {
+            if (search) {
+                result = await this.find({
+                    where: {
+                        $and: [
+                            {userId: user.id},
+                            {
+                                $or: [
+                                    {title: {$regex: `.*${search}.*`}},
+                                    {description: {$regex: `.*${search}.*`}},
+                                ]
+                            }
+                        ]
+                    }
+                });
+            } else {
+                result = await this.find({userId: user.id});
+            }
+        } catch (error) {
+            throw new InternalServerErrorException();
+        }
+
+        result.forEach(project => delete project._id);
+        return result
+    }
 }

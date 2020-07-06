@@ -556,3 +556,142 @@ Creates project with given title and description
         "id": "5e1b3aa6-7881-4371-91ac-9bf94dbb7114"
       }
     ```
+  
+### Get project by id
+
+Returns project with given id
+
+ * **URL**
+
+   ``` /projects/:id ```
+
+* **Method:**
+
+  `GET`
+
+* **URL Params**
+
+    `id = [string] required`
+
+* **Body Params**
+
+   None
+
+* **Headers**
+
+    `Authorization: accessToken`
+
+* **Sample Call:**
+
+    ```bash
+       curl -X GET "http://localhost:3000/projects/3061f3dc-682b-470e-86e3-eab6d54d50a8"\
+       -H "accept: application/json"\
+       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QxIiwiaWF0IjoxNTk0MDIyMjYwLCJleHAiOjE1OTQwMjU4NjB9.N8aNnS4sIRho7SQZQGsUzOaKzUA13cu4q6Jozb5cnjU"
+    ```
+
+* **Sample Response:**
+
+    ```json
+      {
+        "title": "Test Title",
+        "description": "Test Description",
+        "userId": "92e3017e-2676-4414-a039-dbcb28dd045f",
+        "id": "5e1b3aa6-7881-4371-91ac-9bf94dbb7114"
+      }
+    ```
+  
+### Delete project by id
+
+Deletes project with given id
+
+ * **URL**
+
+   ``` /projects/:id ```
+
+* **Method:**
+
+  `DELETE`
+
+* **URL Params**
+
+    `id = [string] required`
+
+* **Body Params**
+
+   None
+
+* **Headers**
+
+    `Authorization: accessToken`
+
+* **Sample Call:**
+
+    ```bash
+       curl -X DELETE "http://localhost:3000/projects/1c8f2521-fb47-4315-9e2b-7cb02e97f502"\
+         -H "accept: */*"\
+         -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QxIiwiaWF0IjoxNTk0MDI0NjU0LCJleHAiOjE1OTQwMjgyNTR9.7XRKHWsXhWcttB-imeZInW3uBJP9nOZjugMbrsVaqRY"
+    ```
+
+* **Sample Response:**
+
+    None
+    
+### Get Projects
+
+Returns all user's projects or projects by corresponding criteria 
+
+ * **URL**
+
+   ``` /projects ```
+
+* **Method:**
+
+  `GET`
+
+* **URL Params**
+
+    None
+
+* **Body Params**
+
+   None
+   
+* **Query Params**
+
+  `search = [string] optional`
+
+* **Headers**
+
+    `Authorization: accessToken`
+
+* **Sample Call:**
+
+    ```bash
+       curl -X GET "http://localhost:3000/projects?search=Search" -H "accept: application/json"\
+        -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QxIiwiaWF0IjoxNTk0MDQwMjA4LCJleHAiOjE1OTQwNDM4MDh9.1yPZGbE4oarPay3MZFJOGW-9qD-Ta132vpWCy5zR4dQ"
+    ```
+
+* **Sample Response:**
+
+    ```json
+     [
+       {
+         "id": "4ebd0a1c-65b4-4dd2-b39e-728d5ed9b002",
+         "title": "Search",
+         "description": "xxx",
+         "userId": "92e3017e-2676-4414-a039-dbcb28dd045f"
+       },
+       {
+         "id": "daf0f963-c550-420b-afa3-8931db06a3f2",
+         "title": "xxx",
+         "description": "Search",
+         "userId": "92e3017e-2676-4414-a039-dbcb28dd045f"
+       },
+       {
+         "id": "974d95de-d625-4687-b567-bdb7912a1357",
+         "title": "Search",
+         "userId": "92e3017e-2676-4414-a039-dbcb28dd045f"
+       }
+     ]
+
+    ```

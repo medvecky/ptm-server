@@ -84,7 +84,7 @@ describe('ProjectsRepository', () => {
             expect(result).toEqual(['project', 'project2']);
         });
 
-        it(' shoult to throw InternalServerException as query execution failed', async () => {
+        it(' should to throw InternalServerException as query execution failed', async () => {
             findMock.mockRejectedValue({error: '333'});
             await expect(projectRepository.getProjects('xxx', mockUser)).rejects.toThrow(InternalServerErrorException);
 

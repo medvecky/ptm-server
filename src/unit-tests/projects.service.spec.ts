@@ -36,7 +36,7 @@ describe('ProjectsService', () => {
     });
 
     describe('CreteProject', () => {
-        it('should create task and return  result', async () => {
+        it('should create project and return  result', async () => {
             projectRepository.createProject.mockResolvedValue('someTask');
             const createTaskDto = {title: 'Test task', description: 'Test desc'};
             expect(projectRepository.createProject).not.toHaveBeenCalled();
@@ -74,7 +74,7 @@ describe('ProjectsService', () => {
             expect(projectService.getProjectById).toHaveBeenCalledWith('1', {"id": "1", "username": "TestUser"});
         });
 
-        it('throws an error as task cold not be found', async () => {
+        it('throws an error as project cold not be found', async () => {
             await expect(projectService.deleteProjectById(1, mockUser)).rejects.toThrow(NotFoundException);
             await expect(projectService.deleteProjectById(1, mockUser))
                 .rejects
@@ -83,7 +83,7 @@ describe('ProjectsService', () => {
     });
 
     describe('getProjects', () => {
-        it('gets all tasks from the repository', async () => {
+        it('gets all projects from the repository', async () => {
             projectRepository.getProjects.mockResolvedValue('someValue');
 
             expect(projectRepository.getProjects).not.toHaveBeenCalled();

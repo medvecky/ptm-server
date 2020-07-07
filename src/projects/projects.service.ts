@@ -4,6 +4,7 @@ import {ProjectRepository} from "./project.repository";
 import {User} from "../auth/User.entity";
 import {CreateProjectDto} from "./dto/create-project.dto";
 import {Project} from "./Project.entity";
+import {GetTasksFilterDto} from "../tasks/dto/get-tasks-filter.dto";
 
 @Injectable()
 export class ProjectsService {
@@ -38,4 +39,10 @@ export class ProjectsService {
         return this.projectRepository.getProjects(search, user);
     }
 
+    async deleteAllProjects(user: User): Promise<void> {
+        const projects = await this.getProjects(undefined, user);
+        await projects.forEach(project => {
+            this.deleteProjectById(project.id, user);
+        });
+    }
 }

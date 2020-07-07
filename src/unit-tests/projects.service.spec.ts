@@ -66,7 +66,7 @@ describe('ProjectsService', () => {
     });
 
     describe('deleteProjectById', () => {
-        it('should call ProjectRepository.delete() to delete task', async () => {
+        it('should call ProjectRepository.delete() to delete project', async () => {
             projectService.getProjectById = jest.fn().mockResolvedValue(true);
             expect(projectRepository.delete).not.toHaveBeenCalled();
             await projectService.deleteProjectById('1', mockUser);
@@ -94,6 +94,26 @@ describe('ProjectsService', () => {
             expect(result).toEqual('someValue');
         });
     });
+
+    describe('deleteAllProjects', () => {
+        it('calls ProjectService.getProjects() and ProjectService.deleteProjectById() as user has projects', async () => {
+            projectService.getProjects = jest.fn();
+            projectService.deleteProjectById = jest.fn();
+            projectService.getProjects.mockResolvedValue([{id: 1}]);
+            await expect(projectService.deleteAllProjects(mockUser)).resolves.toBeUndefined();
+            expect(projectService.getProjects).toHaveBeenCalledWith(undefined, {id: '1', username: 'TestUser'});
+            expect(projectService.deleteProjectById).toHaveBeenCalledWith(1, {id: '1', username: 'TestUser'});
+        });
+        it('calls ProjectService.getProjects() as user has not projects', async () => {
+            projectService.getProjects = jest.fn();
+            projectService.deleteProjectById = jest.fn();
+            projectService.getProjects.mockResolvedValue([]);
+            await expect(projectService.deleteAllProjects(mockUser)).resolves.toBeUndefined();
+            expect(projectService.getProjects).toHaveBeenCalledWith(undefined, {id: '1', username: 'TestUser'});
+            expect(projectService.deleteProjectById).not.toHaveBeenCalled();
+        });
+    });
+
 
 
 });

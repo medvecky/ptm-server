@@ -72,6 +72,14 @@ export class ProjectsController {
         return this.projectService.getProjects(search, user);
     }
 
+    @Delete('/all')
+    @ApiOkResponse({description: 'Projects successfully  deleted'})
+    @ApiUnauthorizedResponse({description: 'Unauthorized'})
+    deleteAllProjects(
+        @GetUser() user: User): Promise<void> {
+        return this.projectService.deleteAllProjects(user);
+    }
+
     @Delete('/:id')
     @ApiOkResponse({description: 'Project successfully  deleted'})
     @ApiUnauthorizedResponse({description: 'Unauthorized'})

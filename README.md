@@ -43,8 +43,6 @@ docker-compose build
 docker-compose up
 ```
 
-by default service operable on localhost:3000
-
 ### App installation for local development
 
 #### Postgres container set up
@@ -69,6 +67,14 @@ $ npm run start:dev
 # production mode
 $ npm run start:prod
 ```
+
+by default service operable on 
+
+[http://localhost:3000](http://localhost:3000)
+
+Swagger API docs available on 
+
+[http://localhost:3000/api](http://localhost:3000/api)
 
 #### Test
 
@@ -695,3 +701,38 @@ Returns all user's projects or projects by corresponding criteria
      ]
 
     ```
+  
+### Delete all projects
+
+Deletes all user's projects
+
+* **URL**
+
+  ``` /projects/all ```
+
+* **Method:**
+
+  `DELETE`
+
+*  **Headers**
+
+   `Authorization: accessToken`
+
+*  **URL Params**
+
+   None
+
+* **Body Params**
+
+    None
+
+* **Sample Call:**
+
+    ```bash
+     curl --location --request DELETE 'http://localhost:3000/projects/all'\
+     --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3R1c2VyMiIsImlhdCI6MTU5MTc4NjQ2OCwiZXhwIjoxNTkxNzkwMDY4fQ.QK5FZ-ZfgeyuEHKQgeUXMZir4sZGE3p5Ew7LGbcMxOQ'
+    ```
+
+* **Sample Response:**
+
+    None

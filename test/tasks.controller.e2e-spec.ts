@@ -27,6 +27,10 @@ describe('TasksController (e2e)', () => {
         await app.close();
     });
 
+    afterEach((done) => {
+        deleteUser(app, testUser, done);
+    });
+
     describe('createTask', () => {
 
         const testTask = {
@@ -531,8 +535,5 @@ describe('TasksController (e2e)', () => {
                     },
                     done);
         });
-    });
-    afterEach((done) => {
-        deleteUser(app, testUser, done);
     });
 });

@@ -1,10 +1,13 @@
-import {Injectable, Logger, NotFoundException} from '@nestjs/common';
+import {BadRequestException, Injectable, Logger, NotFoundException} from '@nestjs/common';
 import {InjectRepository} from "@nestjs/typeorm";
 import {ProjectRepository} from "./project.repository";
 import {User} from "../auth/User.entity";
 import {CreateProjectDto} from "./dto/create-project.dto";
 import {Project} from "./Project.entity";
 import {GetTasksFilterDto} from "../tasks/dto/get-tasks-filter.dto";
+import {TaskStatus} from "../tasks/task.status.enum";
+import {Task} from "../tasks/Task.entity";
+import {UpdateProjectDto} from "./dto/update-project.dto";
 
 @Injectable()
 export class ProjectsService {
@@ -44,5 +47,41 @@ export class ProjectsService {
         await projects.forEach(project => {
             this.deleteProjectById(project.id, user);
         });
+    }
+
+    async updateProject(id: string, updateProjectDto: UpdateProjectDto, user: User): Promise<Project> {
+
+        const {title, description} = updateProjectDto;
+
+        this.logger.verbose(
+            `User with id: ${user.id} updates project with id: ${id} by data: ` +
+            `${JSON.stringify(updateProjectDto)}`);
+
+        let result;
+        if (title && description) {
+            result = await this.projectRepository.findOneAndUpdate(
+                {id: id, userId: user.id},
+                {$set: {title: title, description: description}},
+                {returnOriginal: false});
+        } else if (title) {
+            result = await this.projectRepository.findOneAndUpdate(
+                {id: id, userId: user.id},
+                {$set: {title: title}},
+                {returnOriginal: false});
+        } else if (description) {
+            result = await this.projectRepository.findOneAndUpdate(
+                {id: id, userId: user.id},
+                {$set: {description: description}},
+                {returnOriginal: false});
+        } else {
+            throw new BadRequestException('Empty title and description');
+        }
+
+        if (!result.value) {
+            throw new NotFoundException(`Task with id: ${id} not found`);
+        }
+
+        delete result.value._id;
+        return result.value;
     }
 }

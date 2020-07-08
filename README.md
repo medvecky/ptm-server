@@ -736,3 +736,50 @@ Deletes all user's projects
 * **Sample Response:**
 
     None
+    
+### Update project
+
+Updates project title and / or description
+
+* **URL**
+
+  ``` /projects/:id ```
+
+* **Method:**
+
+  `PATCH`
+
+*  **Headers**
+
+   `Authorization: accessToken`
+
+*  **URL Params**
+
+    `id = [string] required`
+
+* **Body Params**
+
+   `title = [string] optional`
+   
+   `description = [string] optional`
+
+
+* **Sample Call:**
+
+    ```bash
+      curl -X PATCH "http://localhost:3000/projects/7fb5b32d-c8dc-406d-b920-b5eef24e3879"\
+        -H "accept: application/json"\
+        -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QxIiwiaWF0IjoxNTk0MTk4MzY3LCJleHAiOjE1OTQyMDE5Njd9.34Ny2QNvXWstgNXC3lvirFUNPrxbLBJl5a9zyuPnpz0"\
+        -H "Content-Type: application/json" -d "{\"title\":\"Title1\",\"description\":\"Desc1\"}"
+    ```
+
+* **Sample Response:**
+
+    ```json
+      {
+        "title": "Title1",
+        "description": "Desc1",
+        "userId": "92e3017e-2676-4414-a039-dbcb28dd045f",
+        "id": "7fb5b32d-c8dc-406d-b920-b5eef24e3879"
+      }
+    ```

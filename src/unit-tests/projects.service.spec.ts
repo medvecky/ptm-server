@@ -2,13 +2,14 @@ import {Test, TestingModule} from '@nestjs/testing';
 import {ProjectsService} from '../projects/projects.service';
 import {ProjectRepository} from "../projects/project.repository";
 import {User} from "../auth/User.entity";
-import {NotFoundException} from "@nestjs/common";
+import {BadRequestException, NotFoundException} from "@nestjs/common";
 
 const mockProjectRepository = () => ({
     createProject: jest.fn(),
     findOne: jest.fn(),
     delete: jest.fn(),
-    getProjects: jest.fn()
+    getProjects: jest.fn(),
+    findOneAndUpdate: jest.fn()
 });
 
 const mockUser = new User();
@@ -114,6 +115,113 @@ describe('ProjectsService', () => {
         });
     });
 
+    describe('updateProject', () => {
+        it('should properly call projectRepository.findOneAndUpdate() as title and and description was passed',
+            async () => {
+                projectRepository.findOneAndUpdate.mockResolvedValue({value: 'xx'});
+                await expect(projectService.updateProject('1', {title: 'x', description: 'x'}, mockUser))
+                    .resolves
+                    .toBeDefined();
+                expect(projectRepository.findOneAndUpdate).toHaveBeenCalledWith({
+                        id: '1',
+                        userId: '1',
+                    },
+                    {$set: {description: 'x', title: 'x'}},
+                    {returnOriginal: false}
+                );
+            });
 
+        it('should properly call projectRepository.findOneAndUpdate() as description is empty',
+            async () => {
+                projectRepository.findOneAndUpdate.mockResolvedValue({value: 'xx'});
+                await expect(projectService.updateProject('1', {title: 'x', description: ''}, mockUser))
+                    .resolves
+                    .toBeDefined();
+                expect(projectRepository.findOneAndUpdate).toHaveBeenCalledWith({
+                        id: '1',
+                        userId: '1',
+                    },
+                    {$set: {title: 'x'}},
+                    {returnOriginal: false}
+                );
+            });
 
+        it('should properly call projectRepository.findOneAndUpdate() as description not passed',
+            async () => {
+                projectRepository.findOneAndUpdate.mockResolvedValue({value: 'xx'});
+                await expect(projectService.updateProject('1', {title: 'x'}, mockUser))
+                    .resolves
+                    .toBeDefined();
+                expect(projectRepository.findOneAndUpdate).toHaveBeenCalledWith({
+                        id: '1',
+                        userId: '1',
+                    },
+                    {$set: {title: 'x'}},
+                    {returnOriginal: false}
+                );
+            });
+
+        it('should properly call projectRepository.findOneAndUpdate() as title is empty',
+            async () => {
+                projectRepository.findOneAndUpdate.mockResolvedValue({value: 'xx'});
+                await expect(projectService.updateProject('1', {title: '', description: 'x'}, mockUser))
+                    .resolves
+                    .toBeDefined();
+                expect(projectRepository.findOneAndUpdate).toHaveBeenCalledWith({
+                        id: '1',
+                        userId: '1',
+                    },
+                    {$set: {description: 'x'}},
+                    {returnOriginal: false}
+                );
+            });
+
+        it('should properly call projectRepository.findOneAndUpdate() as title not passed',
+            async () => {
+                projectRepository.findOneAndUpdate.mockResolvedValue({value: 'xx'});
+                await expect(projectService.updateProject('1', {description: 'x'}, mockUser))
+                    .resolves
+                    .toBeDefined();
+                expect(projectRepository.findOneAndUpdate).toHaveBeenCalledWith({
+                        id: '1',
+                        userId: '1',
+                    },
+                    {$set: {description: 'x'}},
+                    {returnOriginal: false}
+                );
+            });
+
+        it('should throw error as title and description are empty',
+            async () => {
+                await expect(projectService.updateProject('1', {title: '', description: ''}, mockUser))
+                    .rejects
+                    .toThrow(BadRequestException);
+                await expect(projectService.updateProject('1', {title: '', description: ''}, mockUser))
+                    .rejects
+                    .toThrowError('Empty title and description');
+                expect(projectRepository.findOneAndUpdate).not.toHaveBeenCalledWith();
+            });
+
+        it('should throw error as title and description are not been passed',
+            async () => {
+                await expect(projectService.updateProject('1', {}, mockUser))
+                    .rejects
+                    .toThrow(BadRequestException);
+                await expect(projectService.updateProject('1', {}, mockUser))
+                    .rejects
+                    .toThrowError('Empty title and description');
+                expect(projectRepository.findOneAndUpdate).not.toHaveBeenCalledWith();
+            });
+
+        it('should throw error as given id not exists',
+            async () => {
+                projectRepository.findOneAndUpdate.mockResolvedValue({x: 'y'});
+                await expect(projectService.updateProject('1', {title: 'x', description: 'x'}, mockUser))
+                    .rejects
+                    .toThrow(NotFoundException);
+                await expect(projectService.updateProject('1', {title: 'x', description: 'x'}, mockUser))
+                    .rejects
+                    .toThrowError('Task with id: 1 not found');
+            });
+    });
 });

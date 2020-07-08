@@ -344,4 +344,136 @@ describe('ProjectsController (e2e)', () => {
         });
 
     });
+
+    describe('updateProject', () => {
+        const testProject1 = {title: 'Title original', description: 'Description original', id: ''};
+        beforeEach((done) => {
+            createProject(app, testUser, testProject1, done);
+        });
+
+        it('should return updated project as title and description has been given', (done) => {
+            return request(app.getHttpServer())
+                .patch(`/projects/${testProject1.id}`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({
+                    title: 'Title edited',
+                    description: 'Description edited'
+                })
+                .expect(200, (err, res) => {
+                    const result = res.body;
+                    expect(result.title).toEqual('Title edited');
+                    expect(result.description).toEqual('Description edited');
+                    expect(result.userId).toBeDefined();
+                    expect(result.id).toBeDefined();
+                    done();
+                });
+        });
+
+        it('should return updated project as description is empty', (done) => {
+            return request(app.getHttpServer())
+                .patch(`/projects/${testProject1.id}`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({
+                    title: 'Title edited',
+                    description: ''
+                })
+                .expect(200, (err, res) => {
+                    const result = res.body;
+                    expect(result.title).toEqual('Title edited');
+                    expect(result.description).toEqual(testProject1.description);
+                    expect(result.userId).toBeDefined();
+                    expect(result.id).toBeDefined();
+                    done();
+                });
+        });
+
+        it('should return updated project as description not passed', (done) => {
+            return request(app.getHttpServer())
+                .patch(`/projects/${testProject1.id}`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({
+                    title: 'Title edited'
+                })
+                .expect(200, (err, res) => {
+                    const result = res.body;
+                    expect(result.title).toEqual('Title edited');
+                    expect(result.description).toEqual(testProject1.description);
+                    expect(result.userId).toBeDefined();
+                    expect(result.id).toBeDefined();
+                    done();
+                });
+        });
+
+        it('should return updated project as title is empty', (done) => {
+            return request(app.getHttpServer())
+                .patch(`/projects/${testProject1.id}`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({
+                    title: '',
+                    description: 'Description edited'
+                })
+                .expect(200, (err, res) => {
+                    const result = res.body;
+                    expect(result.title).toEqual(testProject1.title);
+                    expect(result.description).toEqual('Description edited');
+                    expect(result.userId).toBeDefined();
+                    expect(result.id).toBeDefined();
+                    done();
+                });
+        });
+
+        it('should return updated project as title is not passed', (done) => {
+            return request(app.getHttpServer())
+                .patch(`/projects/${testProject1.id}`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({
+                    description: 'Description edited'
+                })
+                .expect(200, (err, res) => {
+                    const result = res.body;
+                    expect(result.title).toEqual(testProject1.title);
+                    expect(result.description).toEqual('Description edited');
+                    expect(result.userId).toBeDefined();
+                    expect(result.id).toBeDefined();
+                    done();
+                });
+        });
+
+        it('should return error as title and description are not valid', (done) => {
+            return request(app.getHttpServer())
+                .patch(`/projects/${testProject1.id}`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({
+                    description: ''
+                })
+                .expect(
+                    400,
+                    {
+                        statusCode: 400,
+                        message: 'Empty title and description',
+                        error: 'Bad Request'
+
+                    },
+                    done);
+        });
+
+        it('should return error as project with given id not found', (done) => {
+            return request(app.getHttpServer())
+                .patch(`/projects/-2`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({
+                    title: 'x',
+                    description: 'x'
+                })
+                .expect(
+                    404,
+                    {
+                        statusCode: 404,
+                        message: 'Task with id: -2 not found',
+                        error: 'Not Found'
+
+                    },
+                    done);
+        });
+    });
 });

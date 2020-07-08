@@ -4,7 +4,7 @@ import {
     Delete,
     Get,
     Logger,
-    Param,
+    Param, Patch,
     Post,
     Query,
     UseGuards,
@@ -14,7 +14,7 @@ import {
 import {
     ApiBadRequestResponse,
     ApiBearerAuth, ApiBody,
-    ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiQuery,
+    ApiCreatedResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiQuery,
     ApiTags,
     ApiUnauthorizedResponse
 } from "@nestjs/swagger";
@@ -24,6 +24,10 @@ import {User} from "../auth/User.entity";
 import {Project} from "./Project.entity";
 import {ProjectsService} from "./projects.service";
 import {CreateProjectDto} from "./dto/create-project.dto";
+import {Task} from "../tasks/Task.entity";
+import {TaskStatusValidationPipe} from "../tasks/pipes/task-status-validation.pipe";
+import {TaskStatus} from "../tasks/task.status.enum";
+import {UpdateProjectDto} from "./dto/update-project.dto";
 
 
 @ApiTags('projects')
@@ -91,4 +95,16 @@ export class ProjectsController {
         return this.projectService.deleteProjectById(id, user);
     }
 
+    @Patch('/:id')
+    @ApiOkResponse({type: Project})
+    @ApiUnauthorizedResponse({description: 'Unauthorized'})
+    @ApiBadRequestResponse({description: 'Bad request'})
+    @ApiNotFoundResponse({description: 'Not found'})
+    @ApiInternalServerErrorResponse({description: 'Internal server error'})
+    updateProject(
+        @Param('id') id: string,
+        @Body() updateProjectDto: UpdateProjectDto,
+        @GetUser() user: User): Promise<Project> {
+        return this.projectService.updateProject(id, updateProjectDto, user);
+    }
 }

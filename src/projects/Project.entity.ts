@@ -1,6 +1,5 @@
 import {BaseEntity, Column, Entity, ManyToOne, ObjectIdColumn, OneToMany, PrimaryColumn} from "typeorm";
 import {ApiProperty} from "@nestjs/swagger";
-import {TaskStatus} from "../tasks/task.status.enum";
 import {User} from "../auth/User.entity";
 import {Task} from "../tasks/Task.entity";
 

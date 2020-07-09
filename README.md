@@ -91,7 +91,9 @@ $ npm run test:cov
 
 ## Endpoints
 
-### Get Tasks
+### Tasks
+
+#### Get Tasks
 
 Returns the user's tasks list.
 Can return all tasks or tasks which correspond to filter.
@@ -192,7 +194,7 @@ The filter can include a task's status and/or text for search in the task's titl
     ]
     ```
 
-### Create task
+#### Create task
 
 Creates a task for the user with a given title, description, and default state OPEN.
 
@@ -217,6 +219,8 @@ Creates a task for the user with a given title, description, and default state O
   `title = [string] required`
 
   `description = [string] required`
+  
+  `projectId = [string] optional`
 
 
 * **Sample Call:**
@@ -241,7 +245,7 @@ Creates a task for the user with a given title, description, and default state O
     }
     ```
 
-### Find task by id
+#### Find task by id
 
 Returns the user's task with the given id.
 
@@ -284,9 +288,9 @@ Returns the user's task with the given id.
     }
     ```
 
-### Update task status
+#### Update task status
 
-Updates tasks status with the given id to the given status.
+Updates task status with the given id to the given status.
 
 * **URL**
 
@@ -337,8 +341,56 @@ Updates tasks status with the given id to the given status.
       }
 
     ```
+  
+#### Update task
 
-### Delete task by id
+Updates task title and / or description
+
+* **URL**
+
+  ``` /tasks/:id ```
+
+* **Method:**
+
+  `PATCH`
+
+*  **Headers**
+
+   `Authorization: accessToken`
+
+*  **URL Params**
+
+    `id = [string] required`
+
+* **Body Params**
+
+   `title = [string] optional`
+   
+   `description = [string] optional`
+
+
+* **Sample Call:**
+
+    ```bash
+     curl -X PATCH "http://localhost:3000/tasks/22db5d92-3953-4b81-9ddd-e07ae0feb73e"\
+      -H "accept: application/json"\
+      -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QxIiwiaWF0IjoxNTk0MjgwOTgwLCJleHAiOjE1OTQyODQ1ODB9.-_8c3MQn4jAGyXBnBp7IO_10Hfi9c2fncydztlgV894"\
+      -H "Content-Type: application/json" -d "{\"title\":\"Title Edited\",\"description\":\"Description Edited\"}"
+    ```
+
+* **Sample Response:**
+
+    ```json
+      {
+        "title": "Title Edited",
+        "description": "Description Edited",
+        "status": "OPEN",
+        "userId": "92e3017e-2676-4414-a039-dbcb28dd045f",
+        "id": "22db5d92-3953-4b81-9ddd-e07ae0feb73e"
+      }
+    ```
+
+#### Delete task by id
 
 Deletes the user's task with the given id.
 
@@ -373,7 +425,7 @@ Deletes the user's task with the given id.
 
     None
 
-### Delete all tasks
+#### Delete all tasks
 
 Deletes all user's tasks
 
@@ -409,9 +461,9 @@ Deletes all user's tasks
     None
 
 
+### Auth
 
-
-### Sign Up
+#### Sign Up
 
 Creates a user with a given username and password
 
@@ -444,7 +496,7 @@ Creates a user with a given username and password
 
     None
 
-### Sign In
+#### Sign In
 
 Returns the user's JWT token if the username and password are valid.
 
@@ -483,7 +535,7 @@ Returns the user's JWT token if the username and password are valid.
          }
      ```
 
-### Delete user
+#### Delete user
 
 Deletes user which was identified by JWT token
 
@@ -518,7 +570,9 @@ Deletes user which was identified by JWT token
 
     None
 
-### Create project
+### Projects
+
+#### Create project
 
 Creates project with given title and description
 
@@ -563,7 +617,7 @@ Creates project with given title and description
       }
     ```
   
-### Get project by id
+#### Get project by id
 
 Returns project with given id
 
@@ -606,7 +660,7 @@ Returns project with given id
       }
     ```
   
-### Delete project by id
+#### Delete project by id
 
 Deletes project with given id
 
@@ -642,7 +696,7 @@ Deletes project with given id
 
     None
     
-### Get Projects
+#### Get Projects
 
 Returns all user's projects or projects by corresponding criteria 
 
@@ -702,7 +756,7 @@ Returns all user's projects or projects by corresponding criteria
 
     ```
   
-### Delete all projects
+#### Delete all projects
 
 Deletes all user's projects
 
@@ -737,7 +791,7 @@ Deletes all user's projects
 
     None
     
-### Update project
+#### Update project
 
 Updates project title and / or description
 

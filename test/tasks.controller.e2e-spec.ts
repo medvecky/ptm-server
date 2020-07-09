@@ -2,7 +2,7 @@ import {Test, TestingModule} from '@nestjs/testing';
 import {INestApplication} from '@nestjs/common';
 import * as request from 'supertest';
 import {AppModule} from './../src/app.module';
-import {createTask, createUser, deleteUser} from "./testfunctions";
+import { createTask, createUser, deleteUser} from "./testfunctions";
 
 describe('TasksController (e2e)', () => {
     let app: INestApplication;
@@ -38,7 +38,7 @@ describe('TasksController (e2e)', () => {
             description: 'TestDesc'
         };
 
-        it('returns created Task', (done) => {
+        it('returns created Task without project', (done) => {
             return request(app.getHttpServer())
                 .post('/tasks')
                 .set('Authorization', 'Bearer ' + testUser.token)
@@ -52,6 +52,27 @@ describe('TasksController (e2e)', () => {
                     expect(res.body.status).toEqual('OPEN');
                     expect(res.body.userId).toBeDefined();
                     expect(res.body.id).toBeDefined();
+                    expect(res.body.projectId).not.toBeDefined();
+                    done();
+                });
+        });
+
+        it('returns created Task with project', (done) => {
+            return request(app.getHttpServer())
+                .post('/tasks')
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({
+                    title: testTask.title,
+                    description: testTask.description,
+                    projectId: 'xxx'
+                })
+                .expect(201, (err, res) => {
+                    expect(res.body.title).toEqual(testTask.title);
+                    expect(res.body.description).toEqual(testTask.description);
+                    expect(res.body.status).toEqual('OPEN');
+                    expect(res.body.userId).toBeDefined();
+                    expect(res.body.id).toBeDefined();
+                    expect(res.body.projectId).toEqual('xxx')
                     done();
                 });
         });
@@ -536,4 +557,141 @@ describe('TasksController (e2e)', () => {
                     done);
         });
     });
+
+    describe('updateTask', () => {
+        const testTask1 = {title: 'Title original', description: 'Description original', id: ''};
+        beforeEach((done) => {
+            createTask(app, testUser, testTask1, done);
+        });
+
+        it('should return updated task as title and description has been given', (done) => {
+            return request(app.getHttpServer())
+                .patch(`/tasks/${testTask1.id}`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({
+                    title: 'Title edited',
+                    description: 'Description edited'
+                })
+                .expect(200, (err, res) => {
+                    const result = res.body;
+                    expect(result.title).toEqual('Title edited');
+                    expect(result.description).toEqual('Description edited');
+                    expect(result.userId).toBeDefined();
+                    expect(result.id).toBeDefined();
+                    expect(result.status).toEqual('OPEN');
+                    done();
+                });
+        });
+
+        it('should return updated task as description is empty', (done) => {
+            return request(app.getHttpServer())
+                .patch(`/tasks/${testTask1.id}`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({
+                    title: 'Title edited',
+                    description: ''
+                })
+                .expect(200, (err, res) => {
+                    const result = res.body;
+                    expect(result.title).toEqual('Title edited');
+                    expect(result.description).toEqual(testTask1.description);
+                    expect(result.userId).toBeDefined();
+                    expect(result.id).toBeDefined();
+                    expect(result.status).toEqual('OPEN');
+                    done();
+                });
+        });
+
+        it('should return updated task as description not passed', (done) => {
+            return request(app.getHttpServer())
+                .patch(`/tasks/${testTask1.id}`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({
+                    title: 'Title edited'
+                })
+                .expect(200, (err, res) => {
+                    const result = res.body;
+                    expect(result.title).toEqual('Title edited');
+                    expect(result.description).toEqual(testTask1.description);
+                    expect(result.userId).toBeDefined();
+                    expect(result.id).toBeDefined();
+                    expect(result.status).toEqual('OPEN');
+                    done();
+                });
+        });
+
+        it('should return updated task as title is empty', (done) => {
+            return request(app.getHttpServer())
+                .patch(`/tasks/${testTask1.id}`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({
+                    title: '',
+                    description: 'Description edited'
+                })
+                .expect(200, (err, res) => {
+                    const result = res.body;
+                    expect(result.title).toEqual(testTask1.title);
+                    expect(result.description).toEqual('Description edited');
+                    expect(result.userId).toBeDefined();
+                    expect(result.id).toBeDefined();
+                    expect(result.status).toEqual('OPEN');
+                    done();
+                });
+        });
+
+        it('should return updated task as title is not passed', (done) => {
+            return request(app.getHttpServer())
+                .patch(`/tasks/${testTask1.id}`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({
+                    description: 'Description edited'
+                })
+                .expect(200, (err, res) => {
+                    const result = res.body;
+                    expect(result.title).toEqual(testTask1.title);
+                    expect(result.description).toEqual('Description edited');
+                    expect(result.userId).toBeDefined();
+                    expect(result.id).toBeDefined();
+                    expect(result.status).toEqual('OPEN');
+                    done();
+                });
+        });
+
+        it('should return error as title and description are not valid', (done) => {
+            return request(app.getHttpServer())
+                .patch(`/tasks/${testTask1.id}`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({
+                    description: ''
+                })
+                .expect(
+                    400,
+                    {
+                        statusCode: 400,
+                        message: 'Empty title and description',
+                        error: 'Bad Request'
+
+                    },
+                    done);
+        });
+
+        it('should return error as task with given id not found', (done) => {
+            return request(app.getHttpServer())
+                .patch(`/tasks/-2`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({
+                    title: 'x',
+                    description: 'x'
+                })
+                .expect(
+                    404,
+                    {
+                        statusCode: 404,
+                        message: 'Task with id: -2 not found',
+                        error: 'Not Found'
+
+                    },
+                    done);
+        });
+    })
 });

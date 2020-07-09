@@ -3,7 +3,7 @@ import {TasksService} from "../tasks/tasks.service";
 import {TaskRepository} from "../tasks/task.repository";
 import {GetTasksFilterDto} from "../tasks/dto/get-tasks-filter.dto";
 import {TaskStatus} from "../tasks/task.status.enum";
-import {NotFoundException} from "@nestjs/common";
+import {BadRequestException, NotFoundException} from "@nestjs/common";
 
 const mockTaskRepository = () => ({
     getTasks: jest.fn(),
@@ -137,4 +137,113 @@ describe('Task Service', () => {
             expect(taskService.deleteTaskById).not.toHaveBeenCalled();
         });
     });
+    describe('updateTask', () => {
+        it('should properly call taskRepository.findOneAndUpdate() as title and and description was passed',
+            async () => {
+                taskRepository.findOneAndUpdate.mockResolvedValue({value: 'xx'});
+                await expect(taskService.updateTask('1', {title: 'x', description: 'x'}, mockUser))
+                    .resolves
+                    .toBeDefined();
+                expect(taskRepository.findOneAndUpdate).toHaveBeenCalledWith({
+                        id: '1',
+                        userId: '1',
+                    },
+                    {$set: {description: 'x', title: 'x'}},
+                    {returnOriginal: false}
+                );
+            });
+
+        it('should properly call taskRepository.findOneAndUpdate() as description is empty',
+            async () => {
+                taskRepository.findOneAndUpdate.mockResolvedValue({value: 'xx'});
+                await expect(taskService.updateTask('1', {title: 'x', description: ''}, mockUser))
+                    .resolves
+                    .toBeDefined();
+                expect(taskRepository.findOneAndUpdate).toHaveBeenCalledWith({
+                        id: '1',
+                        userId: '1',
+                    },
+                    {$set: {title: 'x'}},
+                    {returnOriginal: false}
+                );
+            });
+
+        it('should properly call taskRepository.findOneAndUpdate() as description not passed',
+            async () => {
+                taskRepository.findOneAndUpdate.mockResolvedValue({value: 'xx'});
+                await expect(taskService.updateTask('1', {title: 'x'}, mockUser))
+                    .resolves
+                    .toBeDefined();
+                expect(taskRepository.findOneAndUpdate).toHaveBeenCalledWith({
+                        id: '1',
+                        userId: '1',
+                    },
+                    {$set: {title: 'x'}},
+                    {returnOriginal: false}
+                );
+            });
+
+        it('should properly call taskRepository.findOneAndUpdate() as title is empty',
+            async () => {
+                taskRepository.findOneAndUpdate.mockResolvedValue({value: 'xx'});
+                await expect(taskService.updateTask('1', {title: '', description: 'x'}, mockUser))
+                    .resolves
+                    .toBeDefined();
+                expect(taskRepository.findOneAndUpdate).toHaveBeenCalledWith({
+                        id: '1',
+                        userId: '1',
+                    },
+                    {$set: {description: 'x'}},
+                    {returnOriginal: false}
+                );
+            });
+
+        it('should properly call taskRepository.findOneAndUpdate() as title not passed',
+            async () => {
+                taskRepository.findOneAndUpdate.mockResolvedValue({value: 'xx'});
+                await expect(taskService.updateTask('1', {description: 'x'}, mockUser))
+                    .resolves
+                    .toBeDefined();
+                expect(taskRepository.findOneAndUpdate).toHaveBeenCalledWith({
+                        id: '1',
+                        userId: '1',
+                    },
+                    {$set: {description: 'x'}},
+                    {returnOriginal: false}
+                );
+            });
+
+        it('should throw error as title and description are empty',
+            async () => {
+                await expect(taskService.updateTask('1', {title: '', description: ''}, mockUser))
+                    .rejects
+                    .toThrow(BadRequestException);
+                await expect(taskService.updateTask('1', {title: '', description: ''}, mockUser))
+                    .rejects
+                    .toThrowError('Empty title and description');
+                expect(taskRepository.findOneAndUpdate).not.toHaveBeenCalledWith();
+            });
+
+        it('should throw error as title and description are not been passed',
+            async () => {
+                await expect(taskService.updateTask('1', {}, mockUser))
+                    .rejects
+                    .toThrow(BadRequestException);
+                await expect(taskService.updateTask('1', {}, mockUser))
+                    .rejects
+                    .toThrowError('Empty title and description');
+                expect(taskRepository.findOneAndUpdate).not.toHaveBeenCalledWith();
+            });
+
+        it('should throw error as given id not exists',
+            async () => {
+                taskRepository.findOneAndUpdate.mockResolvedValue({x: 'y'});
+                await expect(taskService.updateTask('1', {title: 'x', description: 'x'}, mockUser))
+                    .rejects
+                    .toThrow(NotFoundException);
+                await expect(taskService.updateTask('1', {title: 'x', description: 'x'}, mockUser))
+                    .rejects
+                    .toThrowError('Task with id: 1 not found');
+            });
+    })
 });

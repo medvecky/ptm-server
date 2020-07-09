@@ -2,7 +2,7 @@ import {Test, TestingModule} from '@nestjs/testing';
 import {INestApplication} from '@nestjs/common';
 import * as request from 'supertest';
 import {AppModule} from './../src/app.module';
-import {createProject, createTask, createUser, deleteUser} from "./testfunctions";
+import {createProject, createUser, deleteUser} from "./testfunctions";
 
 describe('ProjectsController (e2e)', () => {
     let app: INestApplication;
@@ -469,7 +469,7 @@ describe('ProjectsController (e2e)', () => {
                     404,
                     {
                         statusCode: 404,
-                        message: 'Task with id: -2 not found',
+                        message: 'Project with id: -2 not found',
                         error: 'Not Found'
 
                     },

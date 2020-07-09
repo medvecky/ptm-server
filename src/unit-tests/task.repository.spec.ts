@@ -14,6 +14,7 @@ mockUser.id = '1';
 
 describe('TaskRepository', () => {
     const mockCreateTaskDto = {title: 'TestTitle', description: 'TestDesc'};
+    const mockCreateTaskDtoWithProject = {title: 'TestTitle', description: 'TestDesc', projectId: 'ppp' };
     let taskRepository;
     beforeEach(async () => {
         const module = await Test.createTestingModule({
@@ -32,7 +33,7 @@ describe('TaskRepository', () => {
                 save: save,
             });
         });
-        it('creates task, calls task.save() and returns task', async () => {
+        it('creates task, calls task.save() and returns task as projectId not passed', async () => {
             const result = await taskRepository.createTask(mockCreateTaskDto, mockUser);
             delete result.save;
             expect(save).toHaveBeenCalled();
@@ -42,6 +43,20 @@ describe('TaskRepository', () => {
                 description: 'TestDesc',
                 status: TaskStatus.OPEN,
                 userId: '1',
+            });
+        });
+
+        it('creates task, calls task.save() and returns task as projectId was passed', async () => {
+            const result = await taskRepository.createTask(mockCreateTaskDtoWithProject, mockUser);
+            delete result.save;
+            expect(save).toHaveBeenCalled();
+            expect(result).toEqual({
+                id: 'xxx',
+                title: 'TestTitle',
+                description: 'TestDesc',
+                status: TaskStatus.OPEN,
+                userId: '1',
+                projectId: 'ppp'
             });
         });
         it('throws InternalServerException as task.save() failed', async () => {

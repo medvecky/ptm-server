@@ -9,4 +9,7 @@ export class CreateTaskDto {
     @ApiProperty()
     @IsNotEmpty()
     description: string;
+
+    @ApiProperty()
+    projectId: string;
 }

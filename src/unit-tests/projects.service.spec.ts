@@ -221,7 +221,7 @@ describe('ProjectsService', () => {
                     .toThrow(NotFoundException);
                 await expect(projectService.updateProject('1', {title: 'x', description: 'x'}, mockUser))
                     .rejects
-                    .toThrowError('Task with id: 1 not found');
+                    .toThrowError('Project with id: 1 not found');
             });
     });
 });

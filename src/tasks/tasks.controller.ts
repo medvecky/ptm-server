@@ -27,6 +27,8 @@ import {
     ApiUnauthorizedResponse
 } from "@nestjs/swagger";
 
+import {UpdateTaskDto} from "./dto/update-task.dto";
+
 @ApiTags('tasks')
 @ApiBearerAuth()
 @Controller('tasks')
@@ -113,5 +115,18 @@ export class TasksController {
         @Body('status', TaskStatusValidationPipe) status: TaskStatus,
         @GetUser() user: User): Promise<Task> {
         return this.tasksService.updateTaskStatus(id, status, user);
+    }
+
+    @Patch('/:id')
+    @ApiOkResponse({type: Task})
+    @ApiUnauthorizedResponse({description: 'Unauthorized'})
+    @ApiBadRequestResponse({description: 'Bad request'})
+    @ApiNotFoundResponse({description: 'Not found'})
+    @ApiInternalServerErrorResponse({description: 'Internal server error'})
+    updateTask(
+        @Param('id') id: string,
+        @Body() updateTaskDto: UpdateTaskDto,
+        @GetUser() user: User): Promise<Task> {
+        return this.tasksService.updateTask(id, updateTaskDto, user);
     }
 }

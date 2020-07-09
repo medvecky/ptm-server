@@ -13,13 +13,16 @@ export class TaskRepository extends MongoRepository<Task> {
     private logger = new Logger('TaskRepository');
 
     async createTask(createTaskDto: CreateTaskDto, user: User): Promise<Task> {
-        const {title, description} = createTaskDto;
+        const {title, description, projectId} = createTaskDto;
         const task = this.create();
         task.title = title;
         task.description = description;
         task.status = TaskStatus.OPEN;
         task.userId = user.id;
         task.id = uuid();
+        if (projectId) {
+            task.projectId = projectId;
+        }
         try {
             await task.save();
         } catch (error) {
@@ -29,6 +32,7 @@ export class TaskRepository extends MongoRepository<Task> {
             throw new InternalServerErrorException();
         }
 
+        delete task._id;
         return task;
     }
 

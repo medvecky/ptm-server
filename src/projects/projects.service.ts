@@ -4,9 +4,6 @@ import {ProjectRepository} from "./project.repository";
 import {User} from "../auth/User.entity";
 import {CreateProjectDto} from "./dto/create-project.dto";
 import {Project} from "./Project.entity";
-import {GetTasksFilterDto} from "../tasks/dto/get-tasks-filter.dto";
-import {TaskStatus} from "../tasks/task.status.enum";
-import {Task} from "../tasks/Task.entity";
 import {UpdateProjectDto} from "./dto/update-project.dto";
 
 @Injectable()
@@ -78,7 +75,7 @@ export class ProjectsService {
         }
 
         if (!result.value) {
-            throw new NotFoundException(`Task with id: ${id} not found`);
+            throw new NotFoundException(`Project with id: ${id} not found`);
         }
 
         delete result.value._id;

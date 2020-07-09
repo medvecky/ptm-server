@@ -1,4 +1,4 @@
-import {Injectable, Logger, NotFoundException} from '@nestjs/common';
+import {BadRequestException, Injectable, Logger, NotFoundException} from '@nestjs/common';
 import {TaskRepository} from "./task.repository";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Task} from "./Task.entity";
@@ -6,6 +6,7 @@ import {CreateTaskDto} from "./dto/create-task.dto";
 import {TaskStatus} from "./task.status.enum";
 import {GetTasksFilterDto} from "./dto/get-tasks-filter.dto";
 import {User} from "../auth/User.entity";
+import {UpdateTaskDto} from "./dto/update-task.dto";
 
 @Injectable()
 export class TasksService {
@@ -65,4 +66,39 @@ export class TasksService {
         return result.value;
     }
 
+    async updateTask(id: string, updateTaskDto: UpdateTaskDto, user: User): Promise<Task> {
+
+        const {title, description} = updateTaskDto;
+
+        this.logger.verbose(
+            `User with id: ${user.id} updates task with id: ${id} by data: ` +
+            `${JSON.stringify(updateTaskDto)}`);
+
+        let result;
+        if (title && description) {
+            result = await this.taskRepository.findOneAndUpdate(
+                {id: id, userId: user.id},
+                {$set: {title: title, description: description}},
+                {returnOriginal: false});
+        } else if (title) {
+            result = await this.taskRepository.findOneAndUpdate(
+                {id: id, userId: user.id},
+                {$set: {title: title}},
+                {returnOriginal: false});
+        } else if (description) {
+            result = await this.taskRepository.findOneAndUpdate(
+                {id: id, userId: user.id},
+                {$set: {description: description}},
+                {returnOriginal: false});
+        } else {
+            throw new BadRequestException('Empty title and description');
+        }
+
+        if (!result.value) {
+            throw new NotFoundException(`Task with id: ${id} not found`);
+        }
+
+        delete result.value._id;
+        return result.value;
+    }
 }

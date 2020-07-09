@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import {
     ApiBadRequestResponse,
-    ApiBearerAuth, ApiBody,
+    ApiBearerAuth,
     ApiCreatedResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiQuery,
     ApiTags,
     ApiUnauthorizedResponse
@@ -24,9 +24,6 @@ import {User} from "../auth/User.entity";
 import {Project} from "./Project.entity";
 import {ProjectsService} from "./projects.service";
 import {CreateProjectDto} from "./dto/create-project.dto";
-import {Task} from "../tasks/Task.entity";
-import {TaskStatusValidationPipe} from "../tasks/pipes/task-status-validation.pipe";
-import {TaskStatus} from "../tasks/task.status.enum";
 import {UpdateProjectDto} from "./dto/update-project.dto";
 
 

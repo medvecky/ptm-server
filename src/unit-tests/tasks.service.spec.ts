@@ -245,5 +245,68 @@ describe('Task Service', () => {
                     .rejects
                     .toThrowError('Task with id: 1 not found');
             });
-    })
+    });
+
+    describe('addProjectToTask', () => {
+        it('should add project to task', async () => {
+            taskRepository.findOneAndUpdate.mockResolvedValue({value: {projectId: 'xxx'}})
+            const result = await taskService.addProjectToTask('1', 'xxx', mockUser);
+            expect(taskRepository.findOneAndUpdate).toHaveBeenCalledWith({
+                    id: '1',
+                    userId: '1',
+                },
+                {$set: {projectId: 'xxx'}},
+                {returnOriginal: false});
+            expect(result.projectId).toEqual('xxx');
+        });
+        it('throws error when task not found', async () => {
+            taskRepository.findOneAndUpdate.mockResolvedValue({value: undefined})
+            await expect(taskService.addProjectToTask('1', 'xxx', mockUser))
+                .rejects
+                .toThrow(NotFoundException);
+            await expect(taskService.addProjectToTask('1', 'xxx', mockUser))
+                .rejects
+                .toThrowError('Task with id: 1 not found');
+        });
+
+        it('throws error as projectId is empty', async () => {
+            await expect(taskService.addProjectToTask('1', '', mockUser))
+                .rejects
+                .toThrow(BadRequestException);
+            await expect(taskService.addProjectToTask('1', '', mockUser))
+                .rejects
+                .toThrowError('Bad projectId');
+        });
+
+        it('throws error as projectId not defined', async () => {
+            await expect(taskService.addProjectToTask('1', undefined, mockUser))
+                .rejects
+                .toThrow(BadRequestException);
+            await expect(taskService.addProjectToTask('1', undefined, mockUser))
+                .rejects
+                .toThrowError('Bad projectId');
+        });
+    });
+
+    describe('deleteProjectFromTask', () => {
+        it('should add project to task', async () => {
+            taskRepository.findOneAndUpdate.mockResolvedValue({value: {id: 'xxx'}})
+            await taskService.deleteProjectFromTask('1', mockUser);
+            expect(taskRepository.findOneAndUpdate).toHaveBeenCalledWith({
+                    id: '1',
+                    userId: '1',
+                },
+                {$unset: {projectId: ''}},
+                {returnOriginal: false});
+        });
+        it('throws error when task not found', async () => {
+            taskRepository.findOneAndUpdate.mockResolvedValue({value: undefined})
+            await expect(taskService.deleteProjectFromTask('1', mockUser))
+                .rejects
+                .toThrow(NotFoundException);
+            await expect(taskService.deleteProjectFromTask('1', mockUser))
+                .rejects
+                .toThrowError('Task with id: 1 not found');
+        });
+    });
 });

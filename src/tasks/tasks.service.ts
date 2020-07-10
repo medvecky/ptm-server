@@ -101,4 +101,43 @@ export class TasksService {
         delete result.value._id;
         return result.value;
     }
+
+    async addProjectToTask(id: string, projectId: string, user: User): Promise<Task> {
+
+        this.logger.verbose(
+            `User with id: ${user.id}  puts projectId: ${projectId} to task: ${id}`);
+
+        if(!projectId) {
+            throw new BadRequestException('Bad projectId');
+        }
+
+        const result = await this.taskRepository.findOneAndUpdate(
+            {id: id, userId: user.id},
+            {$set: {projectId: projectId}},
+            {returnOriginal: false});
+
+        if(!result.value) {
+            throw new NotFoundException(`Task with id: ${id} not found`);
+        }
+
+        delete result.value._id;
+        return result.value;
+    }
+
+    async deleteProjectFromTask(id: string,  user: User): Promise<Task> {
+        this.logger.verbose(
+            `User with id: ${user.id} removes projectId from task: ${id}`);
+
+        const result = await this.taskRepository.findOneAndUpdate(
+            {id: id, userId: user.id},
+            {$unset: {projectId: ''}},
+            {returnOriginal: false});
+
+        if(!result.value) {
+            throw new NotFoundException(`Task with id: ${id} not found`);
+        }
+
+        delete result.value._id;
+        return result.value;
+    }
 }

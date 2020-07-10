@@ -5,7 +5,7 @@ import {
     Get, Logger,
     Param,
     Patch,
-    Post, Query, UseGuards,
+    Post, Put, Query, UseGuards,
     UsePipes,
     ValidationPipe
 } from '@nestjs/common';
@@ -43,7 +43,7 @@ export class TasksController {
     @ApiOkResponse({ type: [Task]})
     @ApiUnauthorizedResponse({description: 'Unauthorized'})
     @ApiBadRequestResponse({description: 'Bad request'})
-    geTasks(
+    getTasks(
         @Query(ValidationPipe) filterDto: GetTasksFilterDto,
         @GetUser() user: User): Promise<Task[]> {
         this.logger.verbose(
@@ -128,5 +128,41 @@ export class TasksController {
         @Body() updateTaskDto: UpdateTaskDto,
         @GetUser() user: User): Promise<Task> {
         return this.tasksService.updateTask(id, updateTaskDto, user);
+    }
+
+    @Put('/:id/project')
+    @ApiOkResponse({type: Task})
+    @ApiUnauthorizedResponse({description: 'Unauthorized'})
+    @ApiBadRequestResponse({description: 'Bad request'})
+    @ApiNotFoundResponse({description: 'Not found'})
+    @ApiInternalServerErrorResponse({description: 'Internal server error'})
+    @ApiBody({
+        schema: {
+            "type": "object",
+            "properties": {
+                "projectId": {
+                    "type": "string"
+                }
+
+            }
+        }
+    })
+    addProjectToTask(
+        @Param('id') id: string,
+        @Body('projectId') projectId: string,
+        @GetUser() user: User): Promise<Task> {
+        return this.tasksService.addProjectToTask(id, projectId, user);
+    }
+
+    @Delete('/:id/project')
+    @ApiOkResponse({type: Task})
+    @ApiUnauthorizedResponse({description: 'Unauthorized'})
+    @ApiBadRequestResponse({description: 'Bad request'})
+    @ApiNotFoundResponse({description: 'Not found'})
+    @ApiInternalServerErrorResponse({description: 'Internal server error'})
+    deleteProjectFromTask(
+        @Param('id') id: string,
+        @GetUser() user: User): Promise<Task> {
+        return this.tasksService.deleteProjectFromTask(id, user);
     }
 }

@@ -341,6 +341,103 @@ Updates task status with the given id to the given status.
       }
 
     ```
+
+#### Add projectId to task 
+
+Puts projectId to task 
+
+* **URL**
+
+  ``` /tasks/:id/project ```
+
+* **Method:**
+
+  `PUT`
+
+*  **Headers**
+
+   `Authorization: accessToken`
+
+*  **URL Params**
+
+   `id = [string] required`
+
+* **Body Params**
+
+    `projectId = [string] required`
+
+
+* **Sample Call:**
+
+    ```bash
+      curl -X PUT "http://localhost:3000/tasks/5b3cc3ea-ecff-47c9-aded-55b0857a5dfb/project"\
+       -H "accept: application/json"\
+       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QxIiwiaWF0IjoxNTk0MzY3NTc0LCJleHAiOjE1OTQzNzExNzR9.gcb_6a9qWUXgpW1Eampfl4OS8_bKlSk6QoM67BpLnJE"\
+       -H "Content-Type: application/json" -d "{\"projectId\":\"7fb5b32d-c8dc-406d-b920-b5eef24e3879\"}"
+    ```
+
+* **Sample Response:**
+
+    ```json
+      {
+        "title": "Title original",
+        "description": "Description original",
+        "status": "OPEN",
+        "userId": "92e3017e-2676-4414-a039-dbcb28dd045f",
+        "id": "5b3cc3ea-ecff-47c9-aded-55b0857a5dfb",
+        "projectId": "7fb5b32d-c8dc-406d-b920-b5eef24e3879"
+      }
+
+    ```
+
+
+#### Delete projectId from task 
+
+Deletes projectId from task 
+
+* **URL**
+
+  ``` /tasks/:id/project ```
+
+* **Method:**
+
+  `DELETE`
+
+*  **Headers**
+
+   `Authorization: accessToken`
+
+*  **URL Params**
+
+   `id = [string] required`
+
+* **Body Params**
+
+    None
+
+
+* **Sample Call:**
+
+    ```bash
+      curl -X DELETE "http://localhost:3000/tasks/e3acaf67-8f75-48f1-b984-8187af1add86/project"\
+       -H "accept: application/json"\
+       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QxIiwiaWF0IjoxNTk0MzcxNDQ5LCJleHAiOjE1OTQzNzUwNDl9.Yq5cOYq9jX-IuHCA10c91HKal60zNRYOTjQfLscEAXY"
+    ```
+
+* **Sample Response:**
+
+    ```json
+      {
+        "title": "With Project",
+        "description": "With Project",
+        "status": "OPEN",
+        "userId": "92e3017e-2676-4414-a039-dbcb28dd045f",
+        "id": "e3acaf67-8f75-48f1-b984-8187af1add86"
+      }
+
+    ```
+
+
   
 #### Update task
 

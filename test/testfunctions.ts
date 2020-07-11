@@ -41,18 +41,34 @@ export function createUser(app, testUser, done) {
 }
 
 export function createTask(app, testUser, testTask, done) {
-    return request(app.getHttpServer())
-        .post('/tasks')
-        .set('Authorization', 'Bearer ' + testUser.token)
-        .send({
-            title: testTask.title,
-            description: testTask.description
-        })
-        .expect(201, (err, res) => {
-            expect(res.body.id).toBeDefined();
-            testTask.id = res.body.id;
-            done();
-        });
+    if(testTask.projectId) {
+        return request(app.getHttpServer())
+            .post('/tasks')
+            .set('Authorization', 'Bearer ' + testUser.token)
+            .send({
+                title: testTask.title,
+                description: testTask.description,
+                projectId: testTask.projectId
+            })
+            .expect(201, (err, res) => {
+                expect(res.body.id).toBeDefined();
+                testTask.id = res.body.id;
+                done();
+            });
+    } else {
+        return request(app.getHttpServer())
+            .post('/tasks')
+            .set('Authorization', 'Bearer ' + testUser.token)
+            .send({
+                title: testTask.title,
+                description: testTask.description,
+            })
+            .expect(201, (err, res) => {
+                expect(res.body.id).toBeDefined();
+                testTask.id = res.body.id;
+                done();
+            });
+    }
 }
 
 export function createProject(app, testUser, testProject, done) {

@@ -436,7 +436,99 @@ Deletes projectId from task
       }
 
     ```
+#### Get tasks by projectId
 
+Returns task list with given projectId
+
+* **URL**
+
+  ``` /tasks/:projectId/project ```
+
+* **Method:**
+
+  `GET`
+
+*  **Headers**
+
+   `Authorization: accessToken`
+
+*  **URL Params**
+
+   `projectId = [string] required`
+
+* **Body Params**
+
+    None
+
+
+* **Sample Call:**
+
+    ```bash
+      curl -X GET "http://localhost:3000/tasks/67f2ade3-3945-45bf-a4d5-7513d5a5e3ae/project"\
+       -H "accept: application/json"\
+       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QxIiwiaWF0IjoxNTk0NDkwOTEwLCJleHAiOjE1OTQ0OTQ1MTB9.lKJMw7bzg9Dxo7rmt_PDeQfgwaPW9qacGWbwTZNRXA0"
+    ```
+
+* **Sample Response:**
+
+    ```json
+      [
+        {
+          "id": "73408a7e-d631-4d12-a564-d15cb1206cd3",
+          "title": "Task for project1",
+          "description": "Desc",
+          "status": "OPEN",
+          "userId": "3552d845-3db8-43ce-aec1-17c50d6fe9e9",
+          "projectId": "67f2ade3-3945-45bf-a4d5-7513d5a5e3ae"
+        },
+        {
+          "id": "4b953177-7227-422c-8316-69e3d04045ff",
+          "title": "Task for project2",
+          "description": "Desc",
+          "status": "OPEN",
+          "userId": "3552d845-3db8-43ce-aec1-17c50d6fe9e9",
+          "projectId": "67f2ade3-3945-45bf-a4d5-7513d5a5e3ae"
+        }
+      ]
+
+    ```
+
+#### Delete tasks by projectId
+
+Deletes task list with given projectId
+
+* **URL**
+
+  ``` /tasks/by_project/:projectId ```
+
+* **Method:**
+
+  `DELETE`
+
+*  **Headers**
+
+   `Authorization: accessToken`
+
+*  **URL Params**
+
+   `projectId = [string] required`
+
+* **Body Params**
+
+    None
+
+
+* **Sample Call:**
+
+    ```bash
+      curl -X DELETE "http://localhost:3000/tasks/by_project/67f2ade3-3945-45bf-a4d5-7513d5a5e3ae"\
+       -H "accept: */*"\
+       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QxIiwiaWF0IjoxNTk0NDk2MzA4LCJleHAiOjE1OTQ0OTk5MDh9.ti0UjXCB3tfOhqgKojGv02q-0z4OYcB6MwAgbTxB-iM"
+    ```
+
+* **Sample Response:**
+
+    None
 
   
 #### Update task

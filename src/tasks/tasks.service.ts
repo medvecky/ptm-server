@@ -1,4 +1,4 @@
-import {BadRequestException, Injectable, Logger, NotFoundException} from '@nestjs/common';
+import {BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException} from '@nestjs/common';
 import {TaskRepository} from "./task.repository";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Task} from "./Task.entity";
@@ -31,6 +31,28 @@ export class TasksService {
 
         delete foundTask._id;
         return foundTask;
+    }
+
+    async getTaskByProjectId(projectId: string, user: User): Promise<Task[]> {
+        let foundTasks: Task[];
+        try {
+            foundTasks = await this.taskRepository.find({projectId: projectId, userId: user.id});
+        } catch (e) {
+            throw new InternalServerErrorException();
+        }
+
+        foundTasks.forEach(task => delete task._id);
+
+        return foundTasks;
+    }
+
+    async deleteTaskByProjectId(projectId: string, user: User): Promise<void> {
+
+        const tasks = await this.getTaskByProjectId(projectId, user);
+
+        await tasks.forEach(task => {
+            this.deleteTaskById(task.id, user);
+        });
     }
 
     async createTask(createTaskDto: CreateTaskDto, user: User): Promise<Task> {

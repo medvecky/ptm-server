@@ -61,6 +61,26 @@ export class TasksController {
         return this.tasksService.getTaskById(id, user);
     }
 
+    @Get('/:projectId/project')
+    @ApiOkResponse({type: [Task]})
+    @ApiUnauthorizedResponse({description: 'Unauthorized'})
+    @ApiNotFoundResponse({description: 'Not found'})
+    getTasksByProjectId(
+        @Param('projectId') projectId: string,
+        @GetUser() user: User): Promise<Task[]> {
+        return this.tasksService.getTaskByProjectId(projectId, user);
+    }
+
+    @Delete('/by_project/:projectId')
+    @ApiOkResponse({description: 'Tasks successfully  deleted'})
+    @ApiUnauthorizedResponse({description: 'Unauthorized'})
+    @ApiNotFoundResponse({description: 'Not found'})
+    deleteTasksByProjectId(
+        @Param('projectId') projectId: string,
+        @GetUser() user: User): Promise<void> {
+        return this.tasksService.deleteTaskByProjectId(projectId, user);
+    }
+
     @Post()
     @ApiCreatedResponse({type: Task})
     @ApiUnauthorizedResponse({description: 'Unauthorized'})

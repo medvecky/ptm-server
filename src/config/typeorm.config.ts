@@ -10,5 +10,6 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
     password: process.env.RDS_PASSWORD || dbConfig.password,
     entities: [__dirname + '/../**/*.entity.{js,ts}'],
     synchronize: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    // keepConnectionAlive: true
 };

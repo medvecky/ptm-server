@@ -4,9 +4,8 @@ import {
     Delete,
     Get, Logger,
     Param,
-    ParseIntPipe,
     Patch,
-    Post, Query, UseGuards,
+    Post, Put, Query, UseGuards,
     UsePipes,
     ValidationPipe
 } from '@nestjs/common';
@@ -28,6 +27,8 @@ import {
     ApiUnauthorizedResponse
 } from "@nestjs/swagger";
 
+import {UpdateTaskDto} from "./dto/update-task.dto";
+
 @ApiTags('tasks')
 @ApiBearerAuth()
 @Controller('tasks')
@@ -42,7 +43,7 @@ export class TasksController {
     @ApiOkResponse({ type: [Task]})
     @ApiUnauthorizedResponse({description: 'Unauthorized'})
     @ApiBadRequestResponse({description: 'Bad request'})
-    geTasks(
+    getTasks(
         @Query(ValidationPipe) filterDto: GetTasksFilterDto,
         @GetUser() user: User): Promise<Task[]> {
         this.logger.verbose(
@@ -58,6 +59,36 @@ export class TasksController {
         @Param('id') id: string,
         @GetUser() user: User): Promise<Task> {
         return this.tasksService.getTaskById(id, user);
+    }
+
+    @Get('/:projectId/project')
+    @ApiOkResponse({type: [Task]})
+    @ApiUnauthorizedResponse({description: 'Unauthorized'})
+    @ApiNotFoundResponse({description: 'Not found'})
+    getTasksByProjectId(
+        @Param('projectId') projectId: string,
+        @GetUser() user: User): Promise<Task[]> {
+        return this.tasksService.getTaskByProjectId(projectId, user);
+    }
+
+    @Delete('/by_project/:projectId')
+    @ApiOkResponse({description: 'Tasks successfully  deleted'})
+    @ApiUnauthorizedResponse({description: 'Unauthorized'})
+    @ApiNotFoundResponse({description: 'Not found'})
+    deleteTasksByProjectId(
+        @Param('projectId') projectId: string,
+        @GetUser() user: User): Promise<void> {
+        return this.tasksService.deleteTaskByProjectId(projectId, user);
+    }
+
+    @Delete('/project_from_tasks/:projectId')
+    @ApiOkResponse({type: [Task]})
+    @ApiUnauthorizedResponse({description: 'Unauthorized'})
+    @ApiNotFoundResponse({description: 'Not found'})
+    deleteProjectFromTasks(
+        @Param('projectId') projectId: string,
+        @GetUser() user: User): Promise<Task[]> {
+        return this.tasksService.deleteProjectFromTasks(projectId, user);
     }
 
     @Post()
@@ -114,5 +145,54 @@ export class TasksController {
         @Body('status', TaskStatusValidationPipe) status: TaskStatus,
         @GetUser() user: User): Promise<Task> {
         return this.tasksService.updateTaskStatus(id, status, user);
+    }
+
+    @Patch('/:id')
+    @ApiOkResponse({type: Task})
+    @ApiUnauthorizedResponse({description: 'Unauthorized'})
+    @ApiBadRequestResponse({description: 'Bad request'})
+    @ApiNotFoundResponse({description: 'Not found'})
+    @ApiInternalServerErrorResponse({description: 'Internal server error'})
+    updateTask(
+        @Param('id') id: string,
+        @Body() updateTaskDto: UpdateTaskDto,
+        @GetUser() user: User): Promise<Task> {
+        return this.tasksService.updateTask(id, updateTaskDto, user);
+    }
+
+    @Put('/:id/project')
+    @ApiOkResponse({type: Task})
+    @ApiUnauthorizedResponse({description: 'Unauthorized'})
+    @ApiBadRequestResponse({description: 'Bad request'})
+    @ApiNotFoundResponse({description: 'Not found'})
+    @ApiInternalServerErrorResponse({description: 'Internal server error'})
+    @ApiBody({
+        schema: {
+            "type": "object",
+            "properties": {
+                "projectId": {
+                    "type": "string"
+                }
+
+            }
+        }
+    })
+    addProjectToTask(
+        @Param('id') id: string,
+        @Body('projectId') projectId: string,
+        @GetUser() user: User): Promise<Task> {
+        return this.tasksService.addProjectToTask(id, projectId, user);
+    }
+
+    @Delete('/:id/project')
+    @ApiOkResponse({type: Task})
+    @ApiUnauthorizedResponse({description: 'Unauthorized'})
+    @ApiBadRequestResponse({description: 'Bad request'})
+    @ApiNotFoundResponse({description: 'Not found'})
+    @ApiInternalServerErrorResponse({description: 'Internal server error'})
+    deleteProjectFromTask(
+        @Param('id') id: string,
+        @GetUser() user: User): Promise<Task> {
+        return this.tasksService.deleteProjectFromTask(id, user);
     }
 }

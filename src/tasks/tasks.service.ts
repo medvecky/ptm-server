@@ -1,4 +1,4 @@
-import {BadRequestException, Injectable, Logger, NotFoundException} from '@nestjs/common';
+import {BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException} from '@nestjs/common';
 import {TaskRepository} from "./task.repository";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Task} from "./Task.entity";
@@ -6,6 +6,7 @@ import {CreateTaskDto} from "./dto/create-task.dto";
 import {TaskStatus} from "./task.status.enum";
 import {GetTasksFilterDto} from "./dto/get-tasks-filter.dto";
 import {User} from "../auth/User.entity";
+import {UpdateTaskDto} from "./dto/update-task.dto";
 
 @Injectable()
 export class TasksService {
@@ -30,6 +31,28 @@ export class TasksService {
 
         delete foundTask._id;
         return foundTask;
+    }
+
+    async getTaskByProjectId(projectId: string, user: User): Promise<Task[]> {
+        let foundTasks: Task[];
+        try {
+            foundTasks = await this.taskRepository.find({projectId: projectId, userId: user.id});
+        } catch (e) {
+            throw new InternalServerErrorException();
+        }
+
+        foundTasks.forEach(task => delete task._id);
+
+        return foundTasks;
+    }
+
+    async deleteTaskByProjectId(projectId: string, user: User): Promise<void> {
+
+        const tasks = await this.getTaskByProjectId(projectId, user);
+
+        await tasks.forEach(task => {
+            this.deleteTaskById(task.id, user);
+        });
     }
 
     async createTask(createTaskDto: CreateTaskDto, user: User): Promise<Task> {
@@ -65,4 +88,87 @@ export class TasksService {
         return result.value;
     }
 
+    async updateTask(id: string, updateTaskDto: UpdateTaskDto, user: User): Promise<Task> {
+
+        const {title, description} = updateTaskDto;
+
+        this.logger.verbose(
+            `User with id: ${user.id} updates task with id: ${id} by data: ` +
+            `${JSON.stringify(updateTaskDto)}`);
+
+        let result;
+        if (title && description) {
+            result = await this.taskRepository.findOneAndUpdate(
+                {id: id, userId: user.id},
+                {$set: {title: title, description: description}},
+                {returnOriginal: false});
+        } else if (title) {
+            result = await this.taskRepository.findOneAndUpdate(
+                {id: id, userId: user.id},
+                {$set: {title: title}},
+                {returnOriginal: false});
+        } else if (description) {
+            result = await this.taskRepository.findOneAndUpdate(
+                {id: id, userId: user.id},
+                {$set: {description: description}},
+                {returnOriginal: false});
+        } else {
+            throw new BadRequestException('Empty title and description');
+        }
+
+        if (!result.value) {
+            throw new NotFoundException(`Task with id: ${id} not found`);
+        }
+
+        delete result.value._id;
+        return result.value;
+    }
+
+    async addProjectToTask(id: string, projectId: string, user: User): Promise<Task> {
+
+        this.logger.verbose(
+            `User with id: ${user.id}  puts projectId: ${projectId} to task: ${id}`);
+
+        if(!projectId) {
+            throw new BadRequestException('Bad projectId');
+        }
+
+        const result = await this.taskRepository.findOneAndUpdate(
+            {id: id, userId: user.id},
+            {$set: {projectId: projectId}},
+            {returnOriginal: false});
+
+        if(!result.value) {
+            throw new NotFoundException(`Task with id: ${id} not found`);
+        }
+
+        delete result.value._id;
+        return result.value;
+    }
+
+    async deleteProjectFromTask(id: string,  user: User): Promise<Task> {
+        this.logger.verbose(
+            `User with id: ${user.id} removes projectId from task: ${id}`);
+
+        const result = await this.taskRepository.findOneAndUpdate(
+            {id: id, userId: user.id},
+            {$unset: {projectId: ''}},
+            {returnOriginal: false});
+
+        if(!result.value) {
+            throw new NotFoundException(`Task with id: ${id} not found`);
+        }
+
+        delete result.value._id;
+        return result.value;
+    }
+
+    async deleteProjectFromTasks(projectId: string,  user: User): Promise<Task[]> {
+        const result = await this.getTaskByProjectId(projectId, user);
+        result.forEach(task => {
+            this.deleteProjectFromTask(task.id, user)
+            delete task.projectId;
+        });
+        return result;
+    }
 }

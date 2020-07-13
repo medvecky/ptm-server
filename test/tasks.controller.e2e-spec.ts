@@ -2,7 +2,7 @@ import {Test, TestingModule} from '@nestjs/testing';
 import {INestApplication} from '@nestjs/common';
 import * as request from 'supertest';
 import {AppModule} from './../src/app.module';
-import {createTask, createUser, deleteUser} from "./testfunctions";
+import {createProject, createTask, createUser, deleteUser} from "./testfunctions";
 
 describe('TasksController (e2e)', () => {
     let app: INestApplication;
@@ -27,6 +27,10 @@ describe('TasksController (e2e)', () => {
         await app.close();
     });
 
+    afterEach((done) => {
+        deleteUser(app, testUser, done);
+    });
+
     describe('createTask', () => {
 
         const testTask = {
@@ -34,7 +38,7 @@ describe('TasksController (e2e)', () => {
             description: 'TestDesc'
         };
 
-        it('returns created Task', (done) => {
+        it('returns created Task without project', (done) => {
             return request(app.getHttpServer())
                 .post('/tasks')
                 .set('Authorization', 'Bearer ' + testUser.token)
@@ -48,6 +52,27 @@ describe('TasksController (e2e)', () => {
                     expect(res.body.status).toEqual('OPEN');
                     expect(res.body.userId).toBeDefined();
                     expect(res.body.id).toBeDefined();
+                    expect(res.body.projectId).not.toBeDefined();
+                    done();
+                });
+        });
+
+        it('returns created Task with project', (done) => {
+            return request(app.getHttpServer())
+                .post('/tasks')
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({
+                    title: testTask.title,
+                    description: testTask.description,
+                    projectId: 'xxx'
+                })
+                .expect(201, (err, res) => {
+                    expect(res.body.title).toEqual(testTask.title);
+                    expect(res.body.description).toEqual(testTask.description);
+                    expect(res.body.status).toEqual('OPEN');
+                    expect(res.body.userId).toBeDefined();
+                    expect(res.body.id).toBeDefined();
+                    expect(res.body.projectId).toEqual('xxx')
                     done();
                 });
         });
@@ -131,6 +156,51 @@ describe('TasksController (e2e)', () => {
                     },
                     done);
         })
+    });
+
+    describe('getTasksByProjectId', () => {
+        const testTask1 = {title: 'T1', description: 'D1', projectId: 'xxx'};
+        const testTask2 = {title: 'T2', description: 'D2', projectId: 'xxx'};
+        const testTask3 = {title: 'T3', description: 'D3'};
+        beforeEach((done) => {
+            createTask(app, testUser, testTask1, done);
+            createTask(app, testUser, testTask2, done);
+            createTask(app, testUser, testTask3, done);
+        });
+
+        it(`returns user's tasks list with given projectId`, (done) => {
+            return request(app.getHttpServer())
+                .get('/tasks/xxx/project')
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .expect(200, (err, res) => {
+                    const result = res.body;
+                    expect(result.length).toEqual(2);
+                    expect(result[0].title).toEqual(testTask1.title);
+                    expect(result[0].description).toEqual(testTask1.description);
+                    expect(result[0].status).toEqual('OPEN');
+                    expect(result[0].userId).toBeDefined();
+                    expect(result[0].id).toBeDefined();
+                    expect(result[0].projectId).toEqual('xxx');
+                    expect(result[1].title).toEqual(testTask2.title);
+                    expect(result[1].description).toEqual(testTask2.description);
+                    expect(result[1].status).toEqual('OPEN');
+                    expect(result[1].userId).toBeDefined();
+                    expect(result[1].id).toBeDefined();
+                    expect(result[1].projectId).toEqual('xxx');
+                    done();
+                });
+        });
+
+        it(`returns empty tasks list as given projectId not exists`, (done) => {
+            return request(app.getHttpServer())
+                .get('/tasks/yyy/project')
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .expect(200, (err, res) => {
+                    const result = res.body;
+                    expect(result.length).toEqual(0);
+                    done();
+                });
+        });
     });
 
     describe('getTasks', () => {
@@ -425,6 +495,68 @@ describe('TasksController (e2e)', () => {
 
     });
 
+    describe('deleteTasksByProjectId', () => {
+        const testTask1 = {title: 'T1', description: 'D1', projectId: 'xxx'};
+        beforeEach((done) => {
+            createTask(app, testUser, testTask1, done);
+        });
+
+        it(`deletes all user's tasks with given projectId`, (done) => {
+            return request(app.getHttpServer())
+                .delete('/tasks/by_project/xxx')
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .expect(200, {}, done);
+        });
+
+        it('not throws an error when a user has no tasks with given projectId', (done) => {
+            return request(app.getHttpServer())
+                .delete('/tasks/by_project/yyy')
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .expect(200, {}, done);
+        });
+
+    });
+
+    describe('deleteProjectFromTasks', () => {
+        const testTask1 = {title: 'T1', description: 'D1', projectId: 'xxx'};
+        const testTask2 = {title: 'T2', description: 'D2', projectId: 'xxx'};
+        beforeEach((done) => {
+            createTask(app, testUser, testTask1, done);
+            createTask(app, testUser, testTask2, done);
+        });
+
+        it(`deletes project from user's tasks with given projectId`, (done) => {
+            return request(app.getHttpServer())
+                .delete('/tasks/project_from_tasks/xxx')
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .expect(200, (err, res) => {
+                    const result = res.body;
+                    expect(result.length).toEqual(2);
+                    expect(result[0].title).toEqual(testTask1.title);
+                    expect(result[0].description).toEqual(testTask1.description);
+                    expect(result[0].status).toEqual('OPEN');
+                    expect(result[0].userId).toBeDefined();
+                    expect(result[0].id).toBeDefined();
+                    expect(result[0].projectId).not.toBeDefined();
+                    expect(result[1].title).toEqual(testTask2.title);
+                    expect(result[1].description).toEqual(testTask2.description);
+                    expect(result[1].status).toEqual('OPEN');
+                    expect(result[1].userId).toBeDefined();
+                    expect(result[1].id).toBeDefined();
+                    expect(result[1].projectId).not.toBeDefined();
+                    done();
+                });
+        });
+
+        it('not throws an error when a user has no tasks with given projectId', (done) => {
+            return request(app.getHttpServer())
+                .delete('/tasks/project_from_tasks/yyy')
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .expect(200, [], done);
+        });
+
+    });
+
     describe('deleteTaskById', () => {
         const testTask1 = {title: 'T1 FT1', description: 'D1 FC', id: ''};
         beforeEach((done) => {
@@ -532,7 +664,249 @@ describe('TasksController (e2e)', () => {
                     done);
         });
     });
-    afterEach((done) => {
-        deleteUser(app, testUser, done);
+
+    describe('updateTask', () => {
+        const testTask1 = {title: 'Title original', description: 'Description original', id: ''};
+        beforeEach((done) => {
+            createTask(app, testUser, testTask1, done);
+        });
+
+        it('should return updated task as title and description has been given', (done) => {
+            return request(app.getHttpServer())
+                .patch(`/tasks/${testTask1.id}`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({
+                    title: 'Title edited',
+                    description: 'Description edited'
+                })
+                .expect(200, (err, res) => {
+                    const result = res.body;
+                    expect(result.title).toEqual('Title edited');
+                    expect(result.description).toEqual('Description edited');
+                    expect(result.userId).toBeDefined();
+                    expect(result.id).toBeDefined();
+                    expect(result.status).toEqual('OPEN');
+                    done();
+                });
+        });
+
+        it('should return updated task as description is empty', (done) => {
+            return request(app.getHttpServer())
+                .patch(`/tasks/${testTask1.id}`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({
+                    title: 'Title edited',
+                    description: ''
+                })
+                .expect(200, (err, res) => {
+                    const result = res.body;
+                    expect(result.title).toEqual('Title edited');
+                    expect(result.description).toEqual(testTask1.description);
+                    expect(result.userId).toBeDefined();
+                    expect(result.id).toBeDefined();
+                    expect(result.status).toEqual('OPEN');
+                    done();
+                });
+        });
+
+        it('should return updated task as description not passed', (done) => {
+            return request(app.getHttpServer())
+                .patch(`/tasks/${testTask1.id}`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({
+                    title: 'Title edited'
+                })
+                .expect(200, (err, res) => {
+                    const result = res.body;
+                    expect(result.title).toEqual('Title edited');
+                    expect(result.description).toEqual(testTask1.description);
+                    expect(result.userId).toBeDefined();
+                    expect(result.id).toBeDefined();
+                    expect(result.status).toEqual('OPEN');
+                    done();
+                });
+        });
+
+        it('should return updated task as title is empty', (done) => {
+            return request(app.getHttpServer())
+                .patch(`/tasks/${testTask1.id}`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({
+                    title: '',
+                    description: 'Description edited'
+                })
+                .expect(200, (err, res) => {
+                    const result = res.body;
+                    expect(result.title).toEqual(testTask1.title);
+                    expect(result.description).toEqual('Description edited');
+                    expect(result.userId).toBeDefined();
+                    expect(result.id).toBeDefined();
+                    expect(result.status).toEqual('OPEN');
+                    done();
+                });
+        });
+
+        it('should return updated task as title is not passed', (done) => {
+            return request(app.getHttpServer())
+                .patch(`/tasks/${testTask1.id}`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({
+                    description: 'Description edited'
+                })
+                .expect(200, (err, res) => {
+                    const result = res.body;
+                    expect(result.title).toEqual(testTask1.title);
+                    expect(result.description).toEqual('Description edited');
+                    expect(result.userId).toBeDefined();
+                    expect(result.id).toBeDefined();
+                    expect(result.status).toEqual('OPEN');
+                    done();
+                });
+        });
+
+        it('should return error as title and description are not valid', (done) => {
+            return request(app.getHttpServer())
+                .patch(`/tasks/${testTask1.id}`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({
+                    description: ''
+                })
+                .expect(
+                    400,
+                    {
+                        statusCode: 400,
+                        message: 'Empty title and description',
+                        error: 'Bad Request'
+
+                    },
+                    done);
+        });
+
+        it('should return error as task with given id not found', (done) => {
+            return request(app.getHttpServer())
+                .patch(`/tasks/-2`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({
+                    title: 'x',
+                    description: 'x'
+                })
+                .expect(
+                    404,
+                    {
+                        statusCode: 404,
+                        message: 'Task with id: -2 not found',
+                        error: 'Not Found'
+
+                    },
+                    done);
+        });
+    });
+
+    describe('addProjectToTask', () => {
+        const testTask = {title: 'Task title', description: 'Task desc', id: ''};
+        const testProject = {title: 'Project title', description: 'Project desc', id: ''};
+        beforeEach((done) => {
+            createTask(app, testUser, testTask, done);
+        });
+
+        beforeEach((done) => {
+            createProject(app, testUser, testProject, done);
+        });
+
+        it('returns task with projectId', (done) => {
+            return request(app.getHttpServer())
+                .put(`/tasks/${testTask.id}/project`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({projectId: `${testProject.id}`})
+                .expect(200, (err, res) => {
+                    const result = res.body;
+                    expect(result.title).toEqual(testTask.title);
+                    expect(result.description).toEqual(testTask.description);
+                    expect(result.status).toEqual('OPEN');
+                    expect(result.userId).toBeDefined();
+                    expect(result.id).toEqual(testTask.id);
+                    expect(result.projectId).toEqual(testProject.id);
+                    expect(result.projectId.length).toBeGreaterThan(0);
+                    done();
+                });
+        });
+
+        it('throws error as project id is empty', (done) => {
+            return request(app.getHttpServer())
+                .put(`/tasks/${testTask.id}/project`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({projectId: ''})
+                .expect(
+                    400, {
+                        statusCode: 400,
+                        message: 'Bad projectId',
+                        error: 'Bad Request'
+                    },
+                    done);
+        });
+
+        it('throws error as project id was not sent', (done) => {
+            return request(app.getHttpServer())
+                .put(`/tasks/${testTask.id}/project`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .expect(
+                    400, {
+                        statusCode: 400,
+                        message: 'Bad projectId',
+                        error: 'Bad Request'
+                    },
+                    done);
+        });
+
+        it('throws error as task with given id not exists', (done) => {
+            return request(app.getHttpServer())
+                .put(`/tasks/-5/project`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({projectId: `${testProject.id}`})
+                .expect(
+                    404, {
+                        statusCode: 404,
+                        message: 'Task with id: -5 not found',
+                        error: 'Not Found'
+                    },
+                    done);
+        });
+    });
+
+    describe('deleteProjectFromTask', () => {
+        const testTask = {title: 'Task title', description: 'Task desc', id: '', projectId: 'xxx'};
+        beforeEach((done) => {
+            createTask(app, testUser, testTask, done);
+        });
+
+
+        it('returns task without projectId', (done) => {
+            return request(app.getHttpServer())
+                .delete(`/tasks/${testTask.id}/project`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .expect(200, (err, res) => {
+                    const result = res.body;
+                    expect(result.title).toEqual(testTask.title);
+                    expect(result.description).toEqual(testTask.description);
+                    expect(result.status).toEqual('OPEN');
+                    expect(result.userId).toBeDefined();
+                    expect(result.id).toEqual(testTask.id);
+                    expect(result.projectId).not.toBeDefined();
+                    done();
+                });
+        });
+
+        it('throws error as task with given id not exists', (done) => {
+            return request(app.getHttpServer())
+                .delete(`/tasks/-5/project`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .expect(
+                    404, {
+                        statusCode: 404,
+                        message: 'Task with id: -5 not found',
+                        error: 'Not Found'
+                    },
+                    done);
+        });
     });
 });

@@ -1,15 +1,11 @@
-import {IsNotEmpty} from "class-validator";
 import {ApiProperty} from "@nestjs/swagger";
+import {IsNotEmpty} from "class-validator";
 
-export class CreateTaskDto {
+export class CreateProjectDto {
     @ApiProperty()
     @IsNotEmpty()
     title: string;
 
     @ApiProperty()
-    @IsNotEmpty()
     description: string;
-
-    @ApiProperty()
-    projectId: string;
 }

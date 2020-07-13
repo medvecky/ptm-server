@@ -7,10 +7,16 @@ export function deleteUser(app, testUser, done) {
         .expect(200, {})
         .then(() => {
             request(app.getHttpServer())
-                .delete('/auth/delete/user')
+                .delete('/projects/all')
                 .set('Authorization', 'Bearer ' + testUser.token)
                 .expect(200, {})
-                .end(done);
+                .then(() => {
+                    request(app.getHttpServer())
+                        .delete('/auth/delete/user')
+                        .set('Authorization', 'Bearer ' + testUser.token)
+                        .expect(200, {})
+                        .end(done);
+                });
         });
 }
 
@@ -35,16 +41,47 @@ export function createUser(app, testUser, done) {
 }
 
 export function createTask(app, testUser, testTask, done) {
+    if(testTask.projectId) {
+        return request(app.getHttpServer())
+            .post('/tasks')
+            .set('Authorization', 'Bearer ' + testUser.token)
+            .send({
+                title: testTask.title,
+                description: testTask.description,
+                projectId: testTask.projectId
+            })
+            .expect(201, (err, res) => {
+                expect(res.body.id).toBeDefined();
+                testTask.id = res.body.id;
+                done();
+            });
+    } else {
+        return request(app.getHttpServer())
+            .post('/tasks')
+            .set('Authorization', 'Bearer ' + testUser.token)
+            .send({
+                title: testTask.title,
+                description: testTask.description,
+            })
+            .expect(201, (err, res) => {
+                expect(res.body.id).toBeDefined();
+                testTask.id = res.body.id;
+                done();
+            });
+    }
+}
+
+export function createProject(app, testUser, testProject, done) {
     return request(app.getHttpServer())
-        .post('/tasks')
+        .post('/projects')
         .set('Authorization', 'Bearer ' + testUser.token)
         .send({
-            title: testTask.title,
-            description: testTask.description
+            title: testProject.title,
+            description: testProject.description
         })
         .expect(201, (err, res) => {
             expect(res.body.id).toBeDefined();
-            testTask.id = res.body.id;
+            testProject.id = res.body.id;
             done();
         });
 }

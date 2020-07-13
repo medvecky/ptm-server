@@ -1,6 +1,5 @@
 import {User} from '../auth/User.entity';
 import * as bcrypt from 'bcrypt';
-import exp from "constants";
 
 describe('User entity', () => {
     let user: User;

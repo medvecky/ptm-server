@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Post, UseGuards, ValidationPipe} from '@nestjs/common';
+import {Body, Controller, Delete, Logger, Post, UseGuards, ValidationPipe} from '@nestjs/common';
 import {AuthCredentialsDto} from "./dto/auth-credentials.dto";
 import {AuthService} from "./auth.service";
 import {AuthGuard} from "@nestjs/passport";
@@ -16,6 +16,9 @@ import {
 @ApiBearerAuth()
 @Controller('auth')
 export class AuthController {
+
+    private logger = new Logger('AuthController');
+
     constructor(private authService: AuthService) {
     }
 
@@ -25,6 +28,8 @@ export class AuthController {
     @ApiBadRequestResponse({description: 'Bad request'})
     @ApiConflictResponse({description: 'Conflict: user already exists'})
     signUp(@Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto): Promise<void> {
+        this.logger.verbose(
+            `Creating a new user. Data: ${JSON.stringify(authCredentialsDto)}`);
         return this.authService.signUp(authCredentialsDto);
     }
 

@@ -162,4 +162,13 @@ export class TasksService {
         delete result.value._id;
         return result.value;
     }
+
+    async deleteProjectFromTasks(projectId: string,  user: User): Promise<Task[]> {
+        const result = await this.getTaskByProjectId(projectId, user);
+        result.forEach(task => {
+            this.deleteProjectFromTask(task.id, user)
+            delete task.projectId;
+        });
+        return result;
+    }
 }

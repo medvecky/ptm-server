@@ -530,6 +530,61 @@ Deletes task list with given projectId
 
     None
 
+
+#### Delete projectId from tasks
+
+Deletes given projectId from tasks
+
+* **URL**
+
+  ``` /tasks/project_from_tasks/:projectId ```
+
+* **Method:**
+
+  `DELETE`
+
+*  **Headers**
+
+   `Authorization: accessToken`
+
+*  **URL Params**
+
+   `projectId = [string] required`
+
+* **Body Params**
+
+    None
+
+
+* **Sample Call:**
+
+    ```bash
+      curl -X DELETE "http://localhost:3000/tasks/project_from_tasks/af9a1806-2bdd-4fbb-be42-bf79f877222d"\
+       -H "accept: application/json"\
+       -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QxIiwiaWF0IjoxNTk0NjM3MTkyLCJleHAiOjE1OTQ2NDA3OTJ9.55LbuLZZCtEJfDpA6hRbLVjU9gjIfsG-HCkMN60ZrAM"
+    ```
+
+* **Sample Response:**
+
+    ```json
+     [
+       {
+         "id": "64dd56bc-b95c-4263-bbd5-be4e0d3938ee",
+         "title": "1",
+         "description": "1",
+         "status": "OPEN",
+         "userId": "92e3017e-2676-4414-a039-dbcb28dd045f"
+       },
+       {
+         "id": "a4482eba-3ece-418e-aada-a4bbb949be0f",
+         "title": "2",
+         "description": "2",
+         "status": "OPEN",
+         "userId": "92e3017e-2676-4414-a039-dbcb28dd045f"
+       }
+     ]
+    ```
+
   
 #### Update task
 

@@ -81,6 +81,16 @@ export class TasksController {
         return this.tasksService.deleteTaskByProjectId(projectId, user);
     }
 
+    @Delete('/project_from_tasks/:projectId')
+    @ApiOkResponse({type: [Task]})
+    @ApiUnauthorizedResponse({description: 'Unauthorized'})
+    @ApiNotFoundResponse({description: 'Not found'})
+    deleteProjectFromTasks(
+        @Param('projectId') projectId: string,
+        @GetUser() user: User): Promise<Task[]> {
+        return this.tasksService.deleteProjectFromTasks(projectId, user);
+    }
+
     @Post()
     @ApiCreatedResponse({type: Task})
     @ApiUnauthorizedResponse({description: 'Unauthorized'})

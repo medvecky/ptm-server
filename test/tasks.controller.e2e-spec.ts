@@ -517,6 +517,46 @@ describe('TasksController (e2e)', () => {
 
     });
 
+    describe('deleteProjectFromTasks', () => {
+        const testTask1 = {title: 'T1', description: 'D1', projectId: 'xxx'};
+        const testTask2 = {title: 'T2', description: 'D2', projectId: 'xxx'};
+        beforeEach((done) => {
+            createTask(app, testUser, testTask1, done);
+            createTask(app, testUser, testTask2, done);
+        });
+
+        it(`deletes project from user's tasks with given projectId`, (done) => {
+            return request(app.getHttpServer())
+                .delete('/tasks/project_from_tasks/xxx')
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .expect(200, (err, res) => {
+                    const result = res.body;
+                    expect(result.length).toEqual(2);
+                    expect(result[0].title).toEqual(testTask1.title);
+                    expect(result[0].description).toEqual(testTask1.description);
+                    expect(result[0].status).toEqual('OPEN');
+                    expect(result[0].userId).toBeDefined();
+                    expect(result[0].id).toBeDefined();
+                    expect(result[0].projectId).not.toBeDefined();
+                    expect(result[1].title).toEqual(testTask2.title);
+                    expect(result[1].description).toEqual(testTask2.description);
+                    expect(result[1].status).toEqual('OPEN');
+                    expect(result[1].userId).toBeDefined();
+                    expect(result[1].id).toBeDefined();
+                    expect(result[1].projectId).not.toBeDefined();
+                    done();
+                });
+        });
+
+        it('not throws an error when a user has no tasks with given projectId', (done) => {
+            return request(app.getHttpServer())
+                .delete('/tasks/project_from_tasks/yyy')
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .expect(200, [], done);
+        });
+
+    });
+
     describe('deleteTaskById', () => {
         const testTask1 = {title: 'T1 FT1', description: 'D1 FC', id: ''};
         beforeEach((done) => {

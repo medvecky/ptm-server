@@ -610,6 +610,48 @@ describe('TasksController (e2e)', () => {
                 });
         });
 
+        it('returns tasks with beginDate on OPEN to IN_PROGRESS transition', (done) => {
+            return request(app.getHttpServer())
+                .patch(`/tasks/${testTask.id}/status`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({status: 'IN_PROGRESS'})
+                .expect(200, (err, res) => {
+                    const result = res.body;
+                    expect(result.title).toEqual(testTask.title);
+                    expect(result.description).toEqual(testTask.description);
+                    expect(result.status).toEqual('IN_PROGRESS');
+                    expect(result.userId).toBeDefined();
+                    expect(result.id).toEqual(testTask.id);
+                    expect(result.beginDate).toEqual(new Date().toISOString().split('T')[0]);
+                    done();
+                });
+        });
+
+        it('returns tasks with endDate on IN_PROGRESS to DONE transition', (done) => {
+            return request(app.getHttpServer())
+                .patch(`/tasks/${testTask.id}/status`)
+                .set('Authorization', 'Bearer ' + testUser.token)
+                .send({status: 'IN_PROGRESS'})
+                .expect(200)
+                .then(() => {
+                    request(app.getHttpServer())
+                        .patch(`/tasks/${testTask.id}/status`)
+                        .set('Authorization', 'Bearer ' + testUser.token)
+                        .send({status: 'DONE'})
+                        .expect(200, (err, res) => {
+                            const result = res.body;
+                            expect(result.title).toEqual(testTask.title);
+                            expect(result.description).toEqual(testTask.description);
+                            expect(result.status).toEqual('DONE');
+                            expect(result.userId).toBeDefined();
+                            expect(result.id).toEqual(testTask.id);
+                            expect(result.beginDate).toEqual(new Date().toISOString().split('T')[0]);
+                            expect(result.endDate).toEqual(new Date().toISOString().split('T')[0]);
+                            done();
+                        });
+                });
+        });
+
         it('returns updated task as state sent as lower case', (done) => {
             return request(app.getHttpServer())
                 .patch(`/tasks/${testTask.id}/status`)

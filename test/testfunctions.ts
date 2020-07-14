@@ -41,7 +41,7 @@ export function createUser(app, testUser, done) {
 }
 
 export function createTask(app, testUser, testTask, done) {
-    if(testTask.projectId) {
+    if (testTask.projectId) {
         return request(app.getHttpServer())
             .post('/tasks')
             .set('Authorization', 'Bearer ' + testUser.token)

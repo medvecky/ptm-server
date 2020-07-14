@@ -75,12 +75,27 @@ export class TasksService {
 
     async updateTaskStatus(id: string, status: TaskStatus, user: User): Promise<Task> {
 
-        const result = await this.taskRepository.findOneAndUpdate(
-            {id: id, userId: user.id},
-            {$set: {status: status}},
-            {returnOriginal: false});
+        const task = await this.getTaskById(id, user);
+        let result;
 
-        if(!result.value) {
+        if (task.status === TaskStatus.OPEN && status === TaskStatus.IN_PROGRESS) {
+            result = await this.taskRepository.findOneAndUpdate(
+                {id: id, userId: user.id},
+                {$set: {status: status, beginDate: new Date().toISOString().split('T')[0]}},
+                {returnOriginal: false});
+        } else if (task.status === TaskStatus.IN_PROGRESS && status === TaskStatus.DONE) {
+            result = await this.taskRepository.findOneAndUpdate(
+                {id: id, userId: user.id},
+                {$set: {status: status, endDate: new Date().toISOString().split('T')[0]}},
+                {returnOriginal: false});
+        } else {
+            result = await this.taskRepository.findOneAndUpdate(
+                {id: id, userId: user.id},
+                {$set: {status: status}},
+                {returnOriginal: false});
+        }
+
+        if (!result.value) {
             throw new NotFoundException(`Task with id: ${id} not found`);
         }
 
@@ -129,7 +144,7 @@ export class TasksService {
         this.logger.verbose(
             `User with id: ${user.id}  puts projectId: ${projectId} to task: ${id}`);
 
-        if(!projectId) {
+        if (!projectId) {
             throw new BadRequestException('Bad projectId');
         }
 
@@ -138,7 +153,7 @@ export class TasksService {
             {$set: {projectId: projectId}},
             {returnOriginal: false});
 
-        if(!result.value) {
+        if (!result.value) {
             throw new NotFoundException(`Task with id: ${id} not found`);
         }
 
@@ -146,7 +161,7 @@ export class TasksService {
         return result.value;
     }
 
-    async deleteProjectFromTask(id: string,  user: User): Promise<Task> {
+    async deleteProjectFromTask(id: string, user: User): Promise<Task> {
         this.logger.verbose(
             `User with id: ${user.id} removes projectId from task: ${id}`);
 
@@ -155,7 +170,7 @@ export class TasksService {
             {$unset: {projectId: ''}},
             {returnOriginal: false});
 
-        if(!result.value) {
+        if (!result.value) {
             throw new NotFoundException(`Task with id: ${id} not found`);
         }
 
@@ -163,7 +178,7 @@ export class TasksService {
         return result.value;
     }
 
-    async deleteProjectFromTasks(projectId: string,  user: User): Promise<Task[]> {
+    async deleteProjectFromTasks(projectId: string, user: User): Promise<Task[]> {
         const result = await this.getTaskByProjectId(projectId, user);
         result.forEach(task => {
             this.deleteProjectFromTask(task.id, user)

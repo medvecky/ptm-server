@@ -1,3 +1,13 @@
+## [1.0.0] - 2020-07-14
+
+### Added
+ - Support for task time tracking 
+  
+ ### Updated
+  - Task.entity
+  - tasks.service
+  - E2E Tests
+  - Unit tests
 ## [0.4.0] - 2020-07-13
 
 ### Added

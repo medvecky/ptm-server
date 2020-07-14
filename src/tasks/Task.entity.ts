@@ -39,4 +39,12 @@ export class Task extends BaseEntity {
     @ApiProperty()
     @Column()
     projectId: string;
+
+    @ApiProperty()
+    @Column()
+    beginDate: string;
+
+    @ApiProperty()
+    @Column()
+    endDate: string;
 }

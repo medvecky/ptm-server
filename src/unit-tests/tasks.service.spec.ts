@@ -120,6 +120,7 @@ describe('Task Service', () => {
 
     describe('updateTaskStatus', () => {
         it('updates task status', async () => {
+            taskService.getTaskById = jest.fn().mockResolvedValue({status: TaskStatus.OPEN});
             taskRepository.findOneAndUpdate.mockResolvedValue({value: {status: 'DONE'}})
             const result = await taskService.updateTaskStatus('1', TaskStatus.DONE, mockUser);
             expect(taskRepository.findOneAndUpdate).toHaveBeenCalledWith({
@@ -128,9 +129,10 @@ describe('Task Service', () => {
                 },
                 {$set: {status: 'DONE'}},
                 {returnOriginal: false});
-            expect(result.status).toEqual(TaskStatus.DONE);
+            expect(result.status).toEqual('DONE');
         });
         it('throws error when task not found', async () => {
+            taskService.getTaskById = jest.fn().mockResolvedValue({status: TaskStatus.OPEN});
             taskRepository.findOneAndUpdate.mockResolvedValue({value: undefined})
             await expect(taskService.updateTaskStatus('1', TaskStatus.DONE, mockUser))
                 .rejects
@@ -138,6 +140,30 @@ describe('Task Service', () => {
             await expect(taskService.updateTaskStatus('1', TaskStatus.DONE, mockUser))
                 .rejects
                 .toThrowError('Task with id: 1 not found');
+        });
+        it('sets beginDate on transition from OPEN to IN_PROGRESS', async () => {
+            taskService.getTaskById = jest.fn().mockResolvedValue({status: TaskStatus.OPEN});
+            taskRepository.findOneAndUpdate.mockResolvedValue({value: {beginDate: '555'}})
+            const result = await taskService.updateTaskStatus('1', TaskStatus.IN_PROGRESS, mockUser);
+            expect(taskRepository.findOneAndUpdate).toHaveBeenCalledWith({
+                    id: '1',
+                    userId: '1',
+                },
+                {$set: {status: 'IN_PROGRESS', beginDate: new Date().toISOString().split('T')[0]}},
+                {returnOriginal: false});
+            expect(result.beginDate).toEqual('555');
+        });
+        it('sets endDate on transition from IN_PROGRESS to DONE', async () => {
+            taskService.getTaskById = jest.fn().mockResolvedValue({status: TaskStatus.IN_PROGRESS});
+            taskRepository.findOneAndUpdate.mockResolvedValue({value: {endDate: '555'}})
+            const result = await taskService.updateTaskStatus('1', TaskStatus.DONE, mockUser);
+            expect(taskRepository.findOneAndUpdate).toHaveBeenCalledWith({
+                    id: '1',
+                    userId: '1',
+                },
+                {$set: {status: 'DONE', endDate: new Date().toISOString().split('T')[0]}},
+                {returnOriginal: false});
+            expect(result.endDate).toEqual('555');
         });
     });
 

@@ -299,6 +299,10 @@ Returns the user's task with the given id.
 
 Updates task status with the given id to the given status.
 
+On transition from OPEN to IN_PROGRESS sets beginDate.
+
+On transition from IN_PROGRESS to DONE sets endDate.
+
 * **URL**
 
   ``` /tasks/:id/status ```

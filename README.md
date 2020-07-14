@@ -16,7 +16,14 @@ System supports the following operations:
 * Find own task by id
 * Update own task's status
 * Delete own task by id
-
+* Grouping tasks by projects 
+* Task time tracking by beginning and end date fixation
+* Project-related operations:
+    * Create project 
+    * Delete project
+    * Update project info
+    * Assign the task to project
+    * Delete the project from task  
 
 ## Env set up
 

@@ -75,10 +75,25 @@ export class TasksService {
 
     async updateTaskStatus(id: string, status: TaskStatus, user: User): Promise<Task> {
 
-        const result = await this.taskRepository.findOneAndUpdate(
-            {id: id, userId: user.id},
-            {$set: {status: status}},
-            {returnOriginal: false});
+        const task =  await this.getTaskById(id, user);
+        let result;
+
+        if(task.status === TaskStatus.OPEN && status === TaskStatus.IN_PROGRESS) {
+            result = await this.taskRepository.findOneAndUpdate(
+                {id: id, userId: user.id},
+                {$set: {status: status, beginDate: new Date().toISOString().split('T')[0]}},
+                {returnOriginal: false});
+        } else if (task.status === TaskStatus.IN_PROGRESS && status === TaskStatus.DONE) {
+            result = await this.taskRepository.findOneAndUpdate(
+                {id: id, userId: user.id},
+                {$set: {status: status, endDate: new Date().toISOString().split('T')[0]}},
+                {returnOriginal: false});
+        } else {
+            result = await this.taskRepository.findOneAndUpdate(
+                {id: id, userId: user.id},
+                {$set: {status: status}},
+                {returnOriginal: false});
+        }
 
         if(!result.value) {
             throw new NotFoundException(`Task with id: ${id} not found`);

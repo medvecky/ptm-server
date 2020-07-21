@@ -95,6 +95,7 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
+[Integration testing suite](https://github.com/medvecky/ptm-server-integration-testing)
 
 ## Endpoints
 

@@ -35,10 +35,10 @@ System supports the following operations:
 In project root dir create .env file with the following params:
 
 ```.env
-RDS_USERNAME=mondodb_username
-RDS_PASSWORD=nongobd_password
-RDS_URL=mongodb://username:password@ptm-mongo:27017/ptm
-JWT_SECRET=JWT_Secret_String
+RDS_USERNAME=root
+RDS_PASSWORD=example
+RDS_URL=mongodb://root:example@ptm-mongo:27017/ptm
+JWT_SECRET=topSecret51
 ```
 
 ### App installation
